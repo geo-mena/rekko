@@ -15,7 +15,7 @@ async function handleSync() {
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center gap-8">
           <RouterLink to="/" class="text-xl font-bold text-gray-900">
-            StockRecommender
+            Rekko
           </RouterLink>
           <nav class="hidden md:flex gap-6">
             <RouterLink

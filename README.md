@@ -1,4 +1,4 @@
-# Stock Recommendation System
+# Rekko
 
 ![Go Version](https://img.shields.io/badge/Go-1.24-00ADD8?style=flat&logo=go)
 ![Vue Version](https://img.shields.io/badge/Vue-3.5-42b883?style=flat&logo=vue.js)
@@ -7,7 +7,7 @@
 ![CockroachDB](https://img.shields.io/badge/CockroachDB-23.2-6933FF?style=flat&logo=cockroachlabs)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A full-stack application for analyzing stock recommendations and providing investment insights based on analyst ratings and price targets.
+Stock recommendation engine powered by analyst ratings and price targets.
 
 ---
 
@@ -40,7 +40,7 @@ A full-stack application for analyzing stock recommendations and providing inves
 
 ## Project Overview
 
-The Stock Recommendation System aggregates analyst recommendations from external sources and applies a weighted scoring algorithm to identify the most promising investment opportunities. The system provides:
+Rekko aggregates analyst recommendations from external sources and applies a weighted scoring algorithm to identify the most promising investment opportunities. The system provides:
 
 - Real-time data synchronization from external stock APIs
 - Intelligent ranking of stocks based on analyst upgrades, price targets, and brokerage actions
@@ -100,7 +100,7 @@ The fastest way to get the application running is with Docker Compose.
 
 ```bash
 git clone <repository-url>
-cd stock-recommendation-system
+cd rekko
 ```
 
 ### 2. Configure environment variables
@@ -245,7 +245,7 @@ docker-compose up -d cockroachdb
 ```
 
 Access the database:
-- **SQL CLI**: `docker exec -it stock-cockroachdb cockroach sql --insecure`
+- **SQL CLI**: `docker exec -it rekko-cockroachdb cockroach sql --insecure`
 - **Admin UI**: http://localhost:8081
 
 ---
@@ -490,7 +490,7 @@ Response:
 ## Project Structure
 
 ```
-stock-recommendation-system/
+rekko/
 ├── backend/
 │   ├── cmd/
 │   │   └── server/
@@ -741,7 +741,7 @@ curl http://localhost:8080/api/v1/recommendations/top
 - Verify the DATABASE_URL is correct
 - Check if the database exists:
   ```bash
-  docker exec -it stock-cockroachdb cockroach sql --insecure -e "SHOW DATABASES"
+  docker exec -it rekko-cockroachdb cockroach sql --insecure -e "SHOW DATABASES"
   ```
 
 #### 3. Sync returns 401 Unauthorized
