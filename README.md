@@ -1,0 +1,824 @@
+# Stock Recommendation System
+
+![Go Version](https://img.shields.io/badge/Go-1.24-00ADD8?style=flat&logo=go)
+![Vue Version](https://img.shields.io/badge/Vue-3.5-42b883?style=flat&logo=vue.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat&logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-4.1-38B2AC?style=flat&logo=tailwindcss)
+![CockroachDB](https://img.shields.io/badge/CockroachDB-23.2-6933FF?style=flat&logo=cockroachlabs)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+A full-stack application for analyzing stock recommendations and providing investment insights based on analyst ratings and price targets.
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Quick Start (Docker)](#quick-start-docker)
+- [Local Development](#local-development)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup](#frontend-setup)
+  - [Database Only](#database-only)
+- [API Endpoints](#api-endpoints)
+  - [Health Check](#health-check)
+  - [Stock Endpoints](#stock-endpoints)
+  - [Recommendation Endpoints](#recommendation-endpoints)
+  - [Sync Endpoint](#sync-endpoint)
+- [Project Structure](#project-structure)
+- [Recommendation Algorithm](#recommendation-algorithm)
+  - [Scoring Factors](#scoring-factors)
+  - [Rating Values](#rating-values)
+  - [Action Scores](#action-scores)
+- [Environment Variables](#environment-variables)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## Project Overview
+
+The Stock Recommendation System aggregates analyst recommendations from external sources and applies a weighted scoring algorithm to identify the most promising investment opportunities. The system provides:
+
+- Real-time data synchronization from external stock APIs
+- Intelligent ranking of stocks based on analyst upgrades, price targets, and brokerage actions
+- A responsive web interface for browsing, searching, and filtering stock recommendations
+- RESTful API for programmatic access to stock data and recommendations
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Backend** | Go 1.24 with Gin framework |
+| **Frontend** | Vue 3 + TypeScript + Pinia + Tailwind CSS 4 |
+| **Database** | CockroachDB v23.2 |
+| **API Style** | RESTful |
+| **Build Tools** | Docker, Docker Compose |
+| **Package Manager** | pnpm (frontend) |
+
+---
+
+## Features
+
+- **Data Synchronization**: Fetch and store stock data from external APIs with pagination support
+- **Search & Filter**: Search stocks by ticker, company name, or analyst action
+- **Sorting**: Sort stocks by various criteria (ticker, company, action, target price, date)
+- **Stock Details**: View detailed information for individual stocks
+- **Smart Recommendations**: Intelligent scoring algorithm based on:
+  - Rating upgrades (e.g., Hold to Buy)
+  - Target price increases
+  - Brokerage consensus and action types
+  - Analyst credibility signals
+- **Pagination**: Efficient handling of large datasets with server-side pagination
+- **Responsive UI**: Mobile-friendly interface built with Tailwind CSS
+
+---
+
+## Prerequisites
+
+### For Docker Deployment (Recommended)
+- Docker 20.10+
+- Docker Compose 2.0+
+
+### For Local Development
+- Go 1.24+
+- Node.js 20+
+- pnpm 8+ (`npm install -g pnpm`)
+- CockroachDB (can run via Docker)
+
+---
+
+## Quick Start (Docker)
+
+The fastest way to get the application running is with Docker Compose.
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd stock-recommendation-system
+```
+
+### 2. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file and add your API token:
+
+```bash
+# Required: Add your KarenAI API token
+KARENAI_AUTH_TOKEN=your_auth_token_here
+```
+
+### 3. Start all services
+
+```bash
+docker-compose up -d
+```
+
+This will start:
+- **CockroachDB** on port 26257 (DB UI on port 8081)
+- **Backend API** on port 8080
+- **Frontend** on port 3000
+
+### 4. Verify services are running
+
+```bash
+docker-compose ps
+```
+
+You should see all three services in "running" state.
+
+### 5. Access the application
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8080 |
+| CockroachDB UI | http://localhost:8081 |
+
+### 6. Populate the database
+
+The database starts empty. You need to sync data from the external API.
+
+**Option A: Via the UI**
+- Open http://localhost:3000
+- Click the "Sync Data" button in the header
+
+**Option B: Via curl**
+```bash
+curl -X POST http://localhost:8080/api/v1/sync
+```
+
+Expected response:
+```json
+{
+  "message": "sync completed",
+  "count": 150
+}
+```
+
+### 7. Stop services
+
+```bash
+docker-compose down
+```
+
+To also remove the database volume:
+```bash
+docker-compose down -v
+```
+
+---
+
+## Local Development
+
+### Backend Setup
+
+1. **Start CockroachDB** (if not using Docker for the database):
+   ```bash
+   docker-compose up -d cockroachdb
+   ```
+
+2. **Navigate to the backend directory**:
+   ```bash
+   cd backend
+   ```
+
+3. **Install Go dependencies**:
+   ```bash
+   go mod download
+   ```
+
+4. **Set environment variables**:
+   ```bash
+   export DATABASE_URL="postgresql://root@localhost:26257/stockdb?sslmode=disable"
+   export KARENAI_API_URL="https://api.karenai.click"
+   export KARENAI_AUTH_TOKEN="your_token_here"
+   export SERVER_PORT="8080"
+   export GIN_MODE="debug"
+   ```
+
+5. **Run the server**:
+   ```bash
+   go run cmd/server/main.go
+   ```
+
+   The backend will be available at http://localhost:8080
+
+### Frontend Setup
+
+1. **Navigate to the frontend directory**:
+   ```bash
+   cd frontend
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+3. **Set the API URL** (create `.env` file if needed):
+   ```bash
+   echo "VITE_API_BASE_URL=http://localhost:8080" > .env
+   ```
+
+4. **Run the development server**:
+   ```bash
+   pnpm dev
+   ```
+
+   The frontend will be available at http://localhost:5173
+
+### Database Only
+
+To run just CockroachDB for local development:
+
+```bash
+docker-compose up -d cockroachdb
+```
+
+Access the database:
+- **SQL CLI**: `docker exec -it stock-cockroachdb cockroach sql --insecure`
+- **Admin UI**: http://localhost:8081
+
+---
+
+## API Endpoints
+
+Base URL: `http://localhost:8080/api/v1`
+
+### Health Check
+
+**GET** `/health`
+
+Check if the API is running.
+
+```bash
+curl http://localhost:8080/api/v1/health
+```
+
+Response:
+```json
+{
+  "status": "ok"
+}
+```
+
+### Stock Endpoints
+
+#### List Stocks (Paginated)
+
+**GET** `/stocks`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | int | 1 | Page number |
+| `limit` | int | 20 | Items per page (max: 100) |
+| `search` | string | - | Search by ticker or company name |
+| `action` | string | - | Filter by action type |
+| `sortBy` | string | created_at | Sort field: `ticker`, `company`, `action`, `targetTo`, `createdAt` |
+| `sortOrder` | string | desc | Sort order: `asc`, `desc` |
+
+```bash
+# Get first page of stocks
+curl "http://localhost:8080/api/v1/stocks"
+
+# Search for Apple stocks
+curl "http://localhost:8080/api/v1/stocks?search=AAPL"
+
+# Get upgraded stocks sorted by target price
+curl "http://localhost:8080/api/v1/stocks?action=upgraded&sortBy=targetTo&sortOrder=desc"
+
+# Pagination example
+curl "http://localhost:8080/api/v1/stocks?page=2&limit=50"
+```
+
+Response:
+```json
+{
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "ticker": "AAPL",
+      "company": "Apple Inc",
+      "brokerage": "Morgan Stanley",
+      "action": "upgraded",
+      "ratingFrom": "Hold",
+      "ratingTo": "Buy",
+      "targetFrom": 180.00,
+      "targetTo": 220.00,
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "page": 1,
+  "limit": 20,
+  "totalCount": 150,
+  "totalPages": 8,
+  "hasNext": true,
+  "hasPrev": false
+}
+```
+
+#### Get Stock by ID
+
+**GET** `/stocks/:id`
+
+```bash
+curl http://localhost:8080/api/v1/stocks/550e8400-e29b-41d4-a716-446655440000
+```
+
+#### Get Stocks by Ticker
+
+**GET** `/stocks/ticker/:ticker`
+
+```bash
+curl http://localhost:8080/api/v1/stocks/ticker/AAPL
+```
+
+Response:
+```json
+{
+  "data": [
+    {
+      "id": "...",
+      "ticker": "AAPL",
+      "company": "Apple Inc",
+      "brokerage": "Morgan Stanley",
+      "action": "upgraded",
+      ...
+    },
+    {
+      "id": "...",
+      "ticker": "AAPL",
+      "company": "Apple Inc",
+      "brokerage": "Goldman Sachs",
+      "action": "maintained",
+      ...
+    }
+  ]
+}
+```
+
+#### Get Available Actions
+
+**GET** `/stocks/actions`
+
+```bash
+curl http://localhost:8080/api/v1/stocks/actions
+```
+
+Response:
+```json
+{
+  "data": [
+    "upgraded",
+    "downgraded",
+    "initiated",
+    "maintained",
+    "reiterated",
+    "target raised",
+    "target lowered"
+  ]
+}
+```
+
+### Recommendation Endpoints
+
+#### Get Top Recommendations
+
+**GET** `/recommendations`
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | int | 10 | Number of recommendations (max: 50) |
+
+```bash
+# Get top 10 recommendations
+curl http://localhost:8080/api/v1/recommendations
+
+# Get top 5 recommendations
+curl "http://localhost:8080/api/v1/recommendations?limit=5"
+```
+
+Response:
+```json
+{
+  "data": [
+    {
+      "stock": {
+        "id": "...",
+        "ticker": "NVDA",
+        "company": "NVIDIA Corporation",
+        "brokerage": "Bank of America",
+        "action": "upgraded",
+        "ratingFrom": "Neutral",
+        "ratingTo": "Buy",
+        "targetFrom": 450.00,
+        "targetTo": 600.00
+      },
+      "score": 85.5,
+      "reasons": [
+        "Rating upgraded from Neutral to Buy",
+        "Target price increased 33.3% to $600.00",
+        "upgraded by Bank of America"
+      ],
+      "upsidePotential": 33.33
+    }
+  ]
+}
+```
+
+#### Get Best Single Recommendation
+
+**GET** `/recommendations/top`
+
+```bash
+curl http://localhost:8080/api/v1/recommendations/top
+```
+
+Response:
+```json
+{
+  "stock": {
+    "id": "...",
+    "ticker": "NVDA",
+    "company": "NVIDIA Corporation",
+    ...
+  },
+  "score": 85.5,
+  "reasons": [...],
+  "upsidePotential": 33.33
+}
+```
+
+### Sync Endpoint
+
+#### Trigger Data Sync
+
+**POST** `/sync`
+
+Fetches the latest stock data from the external API and updates the database.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/sync
+```
+
+Response:
+```json
+{
+  "message": "sync completed",
+  "count": 150
+}
+```
+
+**Note**: The sync process:
+1. Connects to the KarenAI API
+2. Fetches all stock recommendations (handles pagination automatically)
+3. Upserts records into the database (updates existing, inserts new)
+4. Returns the count of processed records
+
+---
+
+## Project Structure
+
+```
+stock-recommendation-system/
+├── backend/
+│   ├── cmd/
+│   │   └── server/
+│   │       └── main.go              # Application entry point
+│   ├── internal/
+│   │   ├── config/
+│   │   │   └── config.go            # Environment configuration
+│   │   ├── domain/
+│   │   │   ├── stock.go             # Stock entity and DTOs
+│   │   │   └── errors.go            # Domain errors
+│   │   ├── repository/
+│   │   │   ├── interfaces.go        # Repository interfaces
+│   │   │   └── cockroachdb/
+│   │   │       ├── db.go            # Database connection
+│   │   │       └── stock_repository.go  # Stock repository implementation
+│   │   ├── usecase/
+│   │   │   ├── stock_usecase.go     # Stock business logic
+│   │   │   └── recommendation_usecase.go  # Recommendation algorithm
+│   │   ├── delivery/
+│   │   │   └── http/
+│   │   │       ├── router.go        # HTTP router setup
+│   │   │       ├── handler/
+│   │   │       │   ├── stock_handler.go   # Stock HTTP handlers
+│   │   │       │   └── health_handler.go  # Health check handler
+│   │   │       └── middleware/
+│   │   │           ├── cors.go      # CORS middleware
+│   │   │           └── logging.go   # Request logging
+│   │   └── external/
+│   │       └── karenai/
+│   │           └── client.go        # External API client
+│   ├── go.mod
+│   ├── go.sum
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── main.ts                  # Vue app entry
+│   │   ├── App.vue                  # Root component
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── AppHeader.vue    # Navigation header
+│   │   │   │   ├── LoadingSpinner.vue
+│   │   │   │   ├── ErrorAlert.vue
+│   │   │   │   └── Pagination.vue
+│   │   │   ├── stock/
+│   │   │   │   ├── StockSearch.vue
+│   │   │   │   ├── StockTable.vue
+│   │   │   │   └── StockFilters.vue
+│   │   │   └── recommendation/
+│   │   │       └── RecommendationCard.vue
+│   │   ├── views/
+│   │   │   ├── HomeView.vue         # Stock listing page
+│   │   │   ├── StockDetailView.vue  # Individual stock page
+│   │   │   └── RecommendationView.vue  # Recommendations page
+│   │   ├── stores/
+│   │   │   └── stockStore.ts        # Pinia store
+│   │   ├── services/
+│   │   │   ├── api.ts               # Axios instance
+│   │   │   └── stockService.ts      # API service methods
+│   │   ├── composables/
+│   │   │   └── useDebounce.ts       # Debounce hook
+│   │   ├── types/
+│   │   │   └── stock.ts             # TypeScript interfaces
+│   │   └── router/
+│   │       └── index.ts             # Vue Router config
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   └── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
+
+---
+
+## Recommendation Algorithm
+
+The recommendation system uses a weighted multi-factor scoring approach to rank stocks. Each stock receives a score from 0-100 based on the following criteria.
+
+### Scoring Factors
+
+| Factor | Weight | Description |
+|--------|--------|-------------|
+| **Rating Upgrade** | 30% | Positive changes in analyst ratings |
+| **Target Price Increase** | 25% | Percentage increase in price targets |
+| **Action Type** | 25% | Specific analyst actions (upgrade, initiate, etc.) |
+| **Target Price Level** | 20% | Absolute target price as company size indicator |
+
+### Rating Values
+
+The system converts analyst ratings to numerical values for comparison:
+
+| Rating | Value |
+|--------|-------|
+| Strong Sell | 1 |
+| Sell, Underweight | 2 |
+| Hold, Neutral, Equal-Weight, Market Perform, Sector Perform | 3 |
+| Buy, Overweight, Outperform | 4 |
+| Strong Buy, Top Pick | 5 |
+
+### Action Scores
+
+Different analyst actions receive different base scores:
+
+| Action | Score |
+|--------|-------|
+| Upgraded | 100 |
+| Initiated | 80 |
+| Target Raised | 70 |
+| Reiterated | 60 |
+| Maintained | 50 |
+| Target Lowered | 30 |
+| Downgraded | 20 |
+
+### Algorithm Details
+
+1. **Rating Upgrade Score**: Calculated as the difference between new and old ratings, normalized to 0-100. A jump from Hold (3) to Buy (4) scores higher than Hold to Neutral.
+
+2. **Target Price Increase**: The percentage change in target price, capped at 100 points. A 50% increase scores 50 points.
+
+3. **Action Type**: Direct mapping from the action type to a base score, modified by the weight.
+
+4. **Target Price Level**: Higher target prices indicate larger companies:
+   - $500+ = 100 points
+   - $200-499 = 80 points
+   - $100-199 = 60 points
+   - $50-99 = 40 points
+   - Below $50 = 20 points
+
+The final score is the weighted sum of all factors. Stocks are then ranked by score, with ties broken by the most recent update.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DATABASE_URL` | Yes | - | PostgreSQL/CockroachDB connection string |
+| `KARENAI_API_URL` | No | `https://api.karenai.click` | External API base URL |
+| `KARENAI_AUTH_TOKEN` | Yes | - | Bearer token for external API |
+| `SERVER_PORT` | No | `8080` | Backend server port |
+| `GIN_MODE` | No | `debug` | Gin framework mode (`debug`, `release`) |
+| `VITE_API_BASE_URL` | No | `http://localhost:8080` | Frontend API URL |
+
+### Example `.env` file
+
+```bash
+# Database
+DATABASE_URL=postgresql://root@localhost:26257/stockdb?sslmode=disable
+
+# External API
+KARENAI_API_URL=https://api.karenai.click
+KARENAI_AUTH_TOKEN=your_auth_token_here
+
+# Server
+SERVER_PORT=8080
+GIN_MODE=debug
+
+# Frontend
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+---
+
+## Testing
+
+### Backend Testing
+
+Run Go tests:
+
+```bash
+cd backend
+go test ./...
+```
+
+Run with verbose output:
+
+```bash
+go test -v ./...
+```
+
+Run with coverage:
+
+```bash
+go test -cover ./...
+```
+
+### Frontend Testing
+
+Run Vue/TypeScript tests (if configured):
+
+```bash
+cd frontend
+pnpm test
+```
+
+### Manual API Testing
+
+Test the API endpoints using curl:
+
+```bash
+# Health check
+curl http://localhost:8080/api/v1/health
+
+# Sync data
+curl -X POST http://localhost:8080/api/v1/sync
+
+# Get stocks
+curl "http://localhost:8080/api/v1/stocks?limit=5"
+
+# Get recommendations
+curl http://localhost:8080/api/v1/recommendations
+
+# Get best recommendation
+curl http://localhost:8080/api/v1/recommendations/top
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Docker containers won't start
+
+**Symptom**: `docker-compose up` fails or containers exit immediately.
+
+**Solutions**:
+- Check if ports 3000, 8080, 8081, or 26257 are already in use:
+  ```bash
+  lsof -i :8080
+  ```
+- Ensure Docker has sufficient resources (memory, disk space)
+- Check Docker logs:
+  ```bash
+  docker-compose logs backend
+  docker-compose logs cockroachdb
+  ```
+
+#### 2. Backend can't connect to database
+
+**Symptom**: Backend logs show "connection refused" errors.
+
+**Solutions**:
+- Wait for CockroachDB to be fully healthy:
+  ```bash
+  docker-compose logs cockroachdb | grep "health"
+  ```
+- Verify the DATABASE_URL is correct
+- Check if the database exists:
+  ```bash
+  docker exec -it stock-cockroachdb cockroach sql --insecure -e "SHOW DATABASES"
+  ```
+
+#### 3. Sync returns 401 Unauthorized
+
+**Symptom**: `POST /api/v1/sync` returns authentication error.
+
+**Solutions**:
+- Verify `KARENAI_AUTH_TOKEN` is set in your `.env` file
+- Ensure the token is valid and not expired
+- Check if the token was loaded:
+  ```bash
+  docker-compose exec backend env | grep KARENAI
+  ```
+
+#### 4. Frontend shows "Network Error"
+
+**Symptom**: UI can't fetch data, browser console shows CORS or network errors.
+
+**Solutions**:
+- Verify the backend is running:
+  ```bash
+  curl http://localhost:8080/api/v1/health
+  ```
+- Check `VITE_API_BASE_URL` is set correctly
+- Ensure CORS is properly configured in the backend
+- If using Docker, ensure all services are on the same network
+
+#### 5. Empty recommendations list
+
+**Symptom**: Recommendations endpoint returns empty array.
+
+**Solutions**:
+- Ensure data has been synced:
+  ```bash
+  curl -X POST http://localhost:8080/api/v1/sync
+  ```
+- Check if stocks exist:
+  ```bash
+  curl "http://localhost:8080/api/v1/stocks?limit=1"
+  ```
+
+#### 6. Database data persists after `docker-compose down`
+
+**Symptom**: Old data appears after restarting containers.
+
+**Solution**:
+- Remove volumes when stopping:
+  ```bash
+  docker-compose down -v
+  ```
+
+#### 7. pnpm install fails
+
+**Symptom**: Frontend dependencies won't install.
+
+**Solutions**:
+- Ensure pnpm is installed globally:
+  ```bash
+  npm install -g pnpm
+  ```
+- Clear pnpm cache:
+  ```bash
+  pnpm store prune
+  ```
+- Delete `node_modules` and `pnpm-lock.yaml`, then retry
+
+### Getting Help
+
+If you encounter issues not covered here:
+
+1. Check the Docker logs for specific error messages
+2. Verify all environment variables are set correctly
+3. Ensure all prerequisites are installed with the correct versions
+4. Try rebuilding containers: `docker-compose build --no-cache`
+
+---
+
+## License
+
+MIT

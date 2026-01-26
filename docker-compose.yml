@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:v23.2.0
+    container_name: stock-cockroachdb
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+      - "8081:8080"
+    volumes:
+      - cockroach-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stock-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stock-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://root@cockroachdb:26257/stockdb?sslmode=disable
+      - KARENAI_API_URL=https://api.karenai.click
+      - KARENAI_AUTH_TOKEN=${KARENAI_AUTH_TOKEN}
+      - SERVER_PORT=8080
+      - GIN_MODE=release
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - stock-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stock-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - stock-network
+
+volumes:
+  cockroach-data:
+
+networks:
+  stock-network:
+    driver: bridge
