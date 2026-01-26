@@ -33,7 +33,7 @@ export const useStockStore = defineStore('stock', () => {
 
     try {
       const response = await stockService.getStocks(filter.value)
-      stocks.value = response.data
+      stocks.value = response.data ?? []
       pagination.value = {
         page: response.page,
         limit: response.limit,
@@ -69,7 +69,7 @@ export const useStockStore = defineStore('stock', () => {
     error.value = null
 
     try {
-      recommendations.value = await stockService.getRecommendations(limit)
+      recommendations.value = (await stockService.getRecommendations(limit)) ?? []
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch recommendations'
       recommendations.value = []
@@ -88,7 +88,7 @@ export const useStockStore = defineStore('stock', () => {
 
   async function fetchActions() {
     try {
-      actions.value = await stockService.getActions()
+      actions.value = (await stockService.getActions()) ?? []
     } catch (e) {
       actions.value = []
     }
