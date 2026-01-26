@@ -35,6 +35,10 @@ func (u *StockUsecase) ListStocks(ctx context.Context, filter domain.StockFilter
 		return nil, err
 	}
 
+	if stocks == nil {
+		stocks = []domain.Stock{}
+	}
+
 	totalPages := int(math.Ceil(float64(totalCount) / float64(filter.Limit)))
 
 	return &domain.PaginatedStocks{
@@ -53,11 +57,25 @@ func (u *StockUsecase) GetStockByID(ctx context.Context, id uuid.UUID) (*domain.
 }
 
 func (u *StockUsecase) GetStocksByTicker(ctx context.Context, ticker string) ([]domain.Stock, error) {
-	return u.stockRepo.FindByTicker(ctx, ticker)
+	stocks, err := u.stockRepo.FindByTicker(ctx, ticker)
+	if err != nil {
+		return nil, err
+	}
+	if stocks == nil {
+		return []domain.Stock{}, nil
+	}
+	return stocks, nil
 }
 
 func (u *StockUsecase) GetDistinctActions(ctx context.Context) ([]string, error) {
-	return u.stockRepo.GetDistinctActions(ctx)
+	actions, err := u.stockRepo.GetDistinctActions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if actions == nil {
+		return []string{}, nil
+	}
+	return actions, nil
 }
 
 func (u *StockUsecase) SyncFromExternalAPI(ctx context.Context) (int, error) {

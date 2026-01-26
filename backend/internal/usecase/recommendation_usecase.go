@@ -70,6 +70,10 @@ func (u *RecommendationUsecase) GetTopRecommendations(ctx context.Context, limit
 
 	recommendations := u.scoreAndRankStocks(stocks)
 
+	if recommendations == nil {
+		recommendations = []domain.StockRecommendation{}
+	}
+
 	if len(recommendations) > limit {
 		recommendations = recommendations[:limit]
 	}
