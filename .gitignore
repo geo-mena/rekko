@@ -6,7 +6,6 @@
 # Dependencies
 node_modules/
 vendor/
-frontend-v2/
 
 # Build outputs
 dist/

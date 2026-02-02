@@ -1,12 +1,22 @@
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import router from './router'
+
 import App from './App.vue'
-import './style.css'
+import { setupPlugins } from './plugins'
 
-const app = createApp(App)
+import '@/assets/index.css'
+import '@/assets/scrollbar.css'
+import '@/assets/themes.css'
+import '@/assets/chart-theme.css'
+import 'vue-sonner/style.css' // vue sonner style
 
-app.use(createPinia())
-app.use(router)
+import '@/utils/env'
 
-app.mount('#app')
+function bootstrap() {
+  const app = createApp(App)
+
+  setupPlugins(app)
+
+  app.mount('#app')
+}
+
+bootstrap()

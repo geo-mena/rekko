@@ -1,24 +1,24 @@
+import type { RouteRecordRaw } from 'vue-router'
+
+import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
+import { handleHotUpdate, routes } from 'vue-router/auto-routes'
+
+import { createRouterGuard } from './guard'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: () => import('@/views/HomeView.vue')
-    },
-    {
-      path: '/stock/:id',
-      name: 'stock-detail',
-      component: () => import('@/views/StockDetailView.vue')
-    },
-    {
-      path: '/recommendations',
-      name: 'recommendations',
-      component: () => import('@/views/RecommendationView.vue')
-    }
-  ]
+  routes: setupLayouts(routes as RouteRecordRaw[]),
+
+  scrollBehavior() {
+    return { left: 0, top: 0, behavior: 'smooth' }
+  },
 })
 
+createRouterGuard(router)
+
 export default router
+
+if (import.meta.hot) {
+  handleHotUpdate(router)
+}
