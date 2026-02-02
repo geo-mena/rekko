@@ -76,7 +76,10 @@ export function generateVueTable<T>(props: DataTableProps<T>) {
   }
 
   if (useServerPagination) {
-    tableConfig.pageCount = pageCount.value
+    Object.defineProperty(tableConfig, 'pageCount', {
+      get: () => pageCount.value,
+      enumerable: true,
+    })
     tableConfig.manualPagination = true
   }
   else {
