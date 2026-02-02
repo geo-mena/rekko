@@ -6,7 +6,7 @@
 # Dependencies
 node_modules/
 vendor/
-docs/
+docs
 
 # Build outputs
 dist/
