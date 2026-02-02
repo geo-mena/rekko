@@ -1,50 +1,35 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { Loader, RefreshCw } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 
 import { BasicPage } from '@/components/global-layout'
-import { Button } from '@/components/ui/button'
+import { useSyncStocksMutation } from '@/services/api/stocks.api'
 
 import OverviewContent from './components/overview-content.vue'
 
-const tabs = ref([
-  { name: 'Overview', value: 'overview' },
-  { name: 'Analytics', value: 'analytics', disabled: true },
-  { name: 'Reports', value: 'reports', disabled: true },
-  { name: 'Notifications', value: 'notifications', disabled: true },
-])
+const { mutate: syncStocks, isPending: isSyncing } = useSyncStocksMutation()
 
-const activeTab = ref(tabs.value[0].value)
+function handleSync() {
+  syncStocks(undefined, {
+    onSuccess: (data) => {
+      toast.success('Sync completed', { description: `${data.count} stocks synced` })
+    },
+    onError: () => {
+      toast.error('Sync failed', { description: 'Could not sync stock data' })
+    },
+  })
+}
 </script>
 
 <template>
-  <BasicPage
-    title="workspace"
-    description="workspace description"
-    sticky
-  >
+  <BasicPage title="Dashboard" description="Stock market overview and recommendations" sticky>
     <template #actions>
-      <Button
-        @click="() => toast('hello', {
-          position: 'top-center',
-        })"
-      >
-        Download
-      </Button>
+      <UiButton variant="outline" :disabled="isSyncing" @click="handleSync">
+        <Loader v-if="isSyncing" class="animate-spin" />
+        <RefreshCw v-else />
+        Sync Data
+      </UiButton>
     </template>
-
-    <UiTabs :default-value="activeTab" class="w-full">
-      <UiTabsList>
-        <UiTabsTrigger
-          v-for="tab in tabs" :key="tab.value"
-          :value="tab.value"
-          :disabled="tab.disabled"
-        >
-          {{ tab.name }}
-        </UiTabsTrigger>
-      </UiTabsList>
-      <UiTabsContent value="overview" class="space-y-4">
-        <OverviewContent />
-      </UiTabsContent>
-    </UiTabs>
+    <OverviewContent />
   </BasicPage>
 </template>

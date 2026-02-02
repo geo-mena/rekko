@@ -75,6 +75,7 @@ export function useSyncStocksMutation() {
       queryClient.invalidateQueries({ queryKey: ['stockActions'] })
       queryClient.invalidateQueries({ queryKey: ['recommendations'] })
       queryClient.invalidateQueries({ queryKey: ['topRecommendation'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] })
     },
   })
 }

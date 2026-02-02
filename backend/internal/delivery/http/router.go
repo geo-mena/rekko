@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.HealthHandler) *gin.Engine {
+func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.HealthHandler, dashboardHandler *handler.DashboardHandler) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.Recovery())
@@ -21,6 +21,8 @@ func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.Health
 		api.GET("/stocks/:id", stockHandler.GetStock)
 		api.GET("/stocks/ticker/:ticker", stockHandler.GetByTicker)
 		api.GET("/stocks/actions", stockHandler.GetActions)
+
+		api.GET("/dashboard/stats", dashboardHandler.GetStats)
 
 		api.POST("/sync", stockHandler.SyncStocks)
 

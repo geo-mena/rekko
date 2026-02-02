@@ -240,3 +240,70 @@ func sanitizeSortOrder(order string) string {
 	}
 	return "DESC"
 }
+
+func (r *StockRepository) CountAll(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.Conn().QueryRowContext(ctx, "SELECT COUNT(*) FROM stocks").Scan(&count)
+	return count, err
+}
+
+func (r *StockRepository) GetActionDistribution(ctx context.Context) ([]domain.ActionDistribution, error) {
+	rows, err := r.db.Conn().QueryContext(ctx,
+		"SELECT action, COUNT(*) as count FROM stocks GROUP BY action ORDER BY count DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.ActionDistribution
+	for rows.Next() {
+		var item domain.ActionDistribution
+		if err := rows.Scan(&item.Action, &item.Count); err != nil {
+			return nil, err
+		}
+		result = append(result, item)
+	}
+	return result, rows.Err()
+}
+
+func (r *StockRepository) GetBrokerageDistribution(ctx context.Context, limit int) ([]domain.BrokerageDistribution, error) {
+	rows, err := r.db.Conn().QueryContext(ctx,
+		"SELECT brokerage, COUNT(*) as count FROM stocks GROUP BY brokerage ORDER BY count DESC LIMIT $1", limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.BrokerageDistribution
+	for rows.Next() {
+		var item domain.BrokerageDistribution
+		if err := rows.Scan(&item.Brokerage, &item.Count); err != nil {
+			return nil, err
+		}
+		result = append(result, item)
+	}
+	return result, rows.Err()
+}
+
+func (r *StockRepository) GetRecentActivity(ctx context.Context, days int) ([]domain.DailyActivity, error) {
+	rows, err := r.db.Conn().QueryContext(ctx, `
+		SELECT TO_CHAR(created_at::DATE, 'YYYY-MM-DD') AS date, COUNT(*) AS count
+		FROM stocks
+		WHERE created_at >= NOW() - CAST($1 || ' days' AS INTERVAL)
+		GROUP BY created_at::DATE
+		ORDER BY date ASC`, days)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.DailyActivity
+	for rows.Next() {
+		var item domain.DailyActivity
+		if err := rows.Scan(&item.Date, &item.Count); err != nil {
+			return nil, err
+		}
+		result = append(result, item)
+	}
+	return result, rows.Err()
+}

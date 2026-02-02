@@ -55,3 +55,25 @@ type PaginatedStocks struct {
 	HasNext    bool    `json:"hasNext"`
 	HasPrev    bool    `json:"hasPrev"`
 }
+
+type ActionDistribution struct {
+	Action string `json:"action"`
+	Count  int64  `json:"count"`
+}
+
+type BrokerageDistribution struct {
+	Brokerage string `json:"brokerage"`
+	Count     int64  `json:"count"`
+}
+
+type DailyActivity struct {
+	Date  string `json:"date"`
+	Count int64  `json:"count"`
+}
+
+type DashboardStats struct {
+	TotalStocks           int64                   `json:"totalStocks"`
+	ActionDistribution    []ActionDistribution    `json:"actionDistribution"`
+	BrokerageDistribution []BrokerageDistribution `json:"brokerageDistribution"`
+	RecentActivity        []DailyActivity         `json:"recentActivity"`
+}

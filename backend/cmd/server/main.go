@@ -38,11 +38,13 @@ func main() {
 
 	stockUsecase := usecase.NewStockUsecase(stockRepo, karenaiClient)
 	recommendationUsecase := usecase.NewRecommendationUsecase(stockRepo)
+	dashboardUsecase := usecase.NewDashboardUsecase(stockRepo)
 
 	stockHandler := handler.NewStockHandler(stockUsecase, recommendationUsecase)
 	healthHandler := handler.NewHealthHandler()
+	dashboardHandler := handler.NewDashboardHandler(dashboardUsecase)
 
-	router := httpDelivery.NewRouter(stockHandler, healthHandler)
+	router := httpDelivery.NewRouter(stockHandler, healthHandler, dashboardHandler)
 
 	go func() {
 		log.Printf("Server starting on port %s", cfg.ServerPort)

@@ -14,4 +14,8 @@ type StockRepository interface {
 	FindAll(ctx context.Context, filter domain.StockFilter) ([]domain.Stock, int64, error)
 	BulkUpsert(ctx context.Context, stocks []domain.Stock) (int, error)
 	GetDistinctActions(ctx context.Context) ([]string, error)
+	CountAll(ctx context.Context) (int64, error)
+	GetActionDistribution(ctx context.Context) ([]domain.ActionDistribution, error)
+	GetBrokerageDistribution(ctx context.Context, limit int) ([]domain.BrokerageDistribution, error)
+	GetRecentActivity(ctx context.Context, days int) ([]domain.DailyActivity, error)
 }
