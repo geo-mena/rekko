@@ -4,7 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/geomena/stock-recommendation-system/backend/internal/delivery/http/response"
 	"github.com/geomena/stock-recommendation-system/backend/internal/domain"
+	"github.com/geomena/stock-recommendation-system/backend/internal/i18n/en"
 	"github.com/geomena/stock-recommendation-system/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -40,71 +42,72 @@ func (h *StockHandler) ListStocks(c *gin.Context) {
 
 	result, err := h.stockUsecase.ListStocks(c.Request.Context(), filter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	response.SuccessWithPagination(c.Writer, http.StatusOK, en.StocksRetrieved, result.Data, response.PaginationParams{
+		Page:    result.Page,
+		PerPage: result.Limit,
+		Total:   result.TotalCount,
+	})
 }
 
 func (h *StockHandler) GetStock(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid stock ID"})
+		response.BadRequest(c.Writer, en.StockInvalidID)
 		return
 	}
 
 	stock, err := h.stockUsecase.GetStockByID(c.Request.Context(), id)
 	if err != nil {
 		if err == domain.ErrStockNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "stock not found"})
+			response.NotFound(c.Writer, en.StockNotFound)
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, stock)
+	response.Success(c.Writer, http.StatusOK, en.StockRetrieved, stock)
 }
 
 func (h *StockHandler) GetByTicker(c *gin.Context) {
 	ticker := c.Param("ticker")
 	if ticker == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ticker is required"})
+		response.BadRequest(c.Writer, en.StockTickerRequired)
 		return
 	}
 
 	stocks, err := h.stockUsecase.GetStocksByTicker(c.Request.Context(), ticker)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": stocks})
+	response.Success(c.Writer, http.StatusOK, en.StocksRetrieved, stocks)
 }
 
 func (h *StockHandler) GetActions(c *gin.Context) {
 	actions, err := h.stockUsecase.GetDistinctActions(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": actions})
+	response.Success(c.Writer, http.StatusOK, en.ActionsRetrieved, actions)
 }
 
 func (h *StockHandler) SyncStocks(c *gin.Context) {
 	count, err := h.stockUsecase.SyncFromExternalAPI(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "sync completed",
-		"count":   count,
-	})
+	response.Success(c.Writer, http.StatusOK, en.SyncCompleted, gin.H{"count": count})
 }
 
 func (h *StockHandler) GetRecommendations(c *gin.Context) {
@@ -115,24 +118,24 @@ func (h *StockHandler) GetRecommendations(c *gin.Context) {
 
 	recommendations, err := h.recommendationUsecase.GetTopRecommendations(c.Request.Context(), limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": recommendations})
+	response.Success(c.Writer, http.StatusOK, en.RecommendationsRetrieved, recommendations)
 }
 
 func (h *StockHandler) GetTopRecommendation(c *gin.Context) {
 	recommendation, err := h.recommendationUsecase.GetBestStock(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
 
 	if recommendation == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no recommendations available"})
+		response.NotFound(c.Writer, en.NoRecommendationsAvailable)
 		return
 	}
 
-	c.JSON(http.StatusOK, recommendation)
+	response.Success(c.Writer, http.StatusOK, en.TopRecommendationRetrieved, recommendation)
 }

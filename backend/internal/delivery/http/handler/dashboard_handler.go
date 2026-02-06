@@ -3,6 +3,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/geomena/stock-recommendation-system/backend/internal/delivery/http/response"
+	"github.com/geomena/stock-recommendation-system/backend/internal/i18n/en"
 	"github.com/geomena/stock-recommendation-system/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -18,8 +20,8 @@ func NewDashboardHandler(du *usecase.DashboardUsecase) *DashboardHandler {
 func (h *DashboardHandler) GetStats(c *gin.Context) {
 	stats, err := h.dashboardUsecase.GetDashboardStats(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.InternalServerError(c.Writer, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, stats)
+	response.Success(c.Writer, http.StatusOK, en.DashboardStatsRetrieved, stats)
 }

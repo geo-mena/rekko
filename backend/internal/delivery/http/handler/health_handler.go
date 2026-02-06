@@ -3,6 +3,8 @@ package handler
 import (
 	"net/http"
 
+	"github.com/geomena/stock-recommendation-system/backend/internal/delivery/http/response"
+	"github.com/geomena/stock-recommendation-system/backend/internal/i18n/en"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +15,5 @@ func NewHealthHandler() *HealthHandler {
 }
 
 func (h *HealthHandler) Health(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": "healthy",
-	})
+	response.MessageOnly(c.Writer, http.StatusOK, en.ServiceRunning)
 }
