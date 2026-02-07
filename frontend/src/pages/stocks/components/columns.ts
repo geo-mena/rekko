@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 
-import { Landmark } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, Landmark, Minus } from 'lucide-vue-next'
 import { h } from 'vue'
 
 import DataTableColumnHeader from '@/components/data-table/column-header.vue'
@@ -93,9 +93,37 @@ export const columns: ColumnDef<Stock>[] = [
     id: 'targetPrice',
     header: ({ column }) => h(DataTableColumnHeader<Stock>, { column, title: 'Target Price' }),
     cell: ({ row }) => {
-      const from = formatPrice(row.original.targetFrom)
-      const to = formatPrice(row.original.targetTo)
-      return h('div', { class: 'text-sm' }, `${from} → ${to}`)
+      const fromValue = row.original.targetFrom
+      const toValue = row.original.targetTo
+      const from = formatPrice(fromValue)
+      const to = formatPrice(toValue)
+
+      const priceChange = fromValue && toValue
+        ? ((toValue - fromValue) / fromValue) * 100
+        : null
+
+      const priceText = `${from} → ${to}`
+
+      if (priceChange === null) {
+        return h('div', { class: 'text-sm' }, priceText)
+      }
+
+      const isPositive = priceChange > 0
+      const isNegative = priceChange < 0
+      const icon = isPositive ? ArrowUp : isNegative ? ArrowDown : Minus
+      const colorClass = isPositive
+        ? 'text-emerald-600'
+        : isNegative
+          ? 'text-red-600'
+          : 'text-muted-foreground'
+
+      const percentageText = `${isPositive ? '+' : ''}${priceChange.toFixed(1)}%`
+
+      return h('div', { class: 'flex items-center gap-1.5 text-sm' }, [
+        h('span', {}, priceText),
+        h(icon, { class: `size-3.5 ${colorClass}` }),
+        h('span', { class: `text-xs font-medium ${colorClass}` }, percentageText),
+      ])
     },
     enableSorting: false,
   },
