@@ -10,6 +10,7 @@ import type { Stock } from '../data/schema'
 
 import { actionStatuses, getActionType } from '../data/data'
 import DataTableRowActions from './data-table-row-actions.vue'
+import DataTableTickerCell from './data-table-ticker-cell.vue'
 
 function formatPrice(value: number): string {
   return value ? `$${value.toFixed(2)}` : '-'
@@ -25,7 +26,7 @@ export const columns: ColumnDef<Stock>[] = [
   {
     accessorKey: 'ticker',
     header: ({ column }) => h(DataTableColumnHeader<Stock>, { column, title: 'Ticker' }),
-    cell: ({ row }) => h('div', { class: 'font-semibold' }, row.getValue('ticker')),
+    cell: ({ row }) => h(DataTableTickerCell, { row }),
     enableSorting: true,
     enableHiding: false,
   },
