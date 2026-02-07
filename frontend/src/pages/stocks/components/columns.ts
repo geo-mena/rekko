@@ -1,13 +1,14 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 
+import { Landmark } from 'lucide-vue-next'
 import { h } from 'vue'
 
 import DataTableColumnHeader from '@/components/data-table/column-header.vue'
-import Badge from '@/components/ui/badge/Badge.vue'
+import { Badge } from '@/components/ui/badge'
 
 import type { Stock } from '../data/schema'
 
-import { actionStyles, getActionType } from '../data/data'
+import { actionStatuses, getActionType } from '../data/data'
 import DataTableRowActions from './data-table-row-actions.vue'
 
 function formatPrice(value: number): string {
@@ -37,7 +38,17 @@ export const columns: ColumnDef<Stock>[] = [
   {
     accessorKey: 'brokerage',
     header: ({ column }) => h(DataTableColumnHeader<Stock>, { column, title: 'Brokerage' }),
-    cell: ({ row }) => h('div', { class: 'max-w-[180px] truncate' }, row.getValue('brokerage')),
+    cell: ({ row }) => {
+      const brokerage = row.getValue('brokerage') as string
+      const displayText = brokerage || 'Not available'
+      return h(Badge, {
+        class: 'flex max-w-[180px] items-center',
+        variant: 'outline',
+      }, () => [
+        h(Landmark, { class: 'mr-2 h-4 w-4' }),
+        h('span', { class: 'truncate' }, displayText),
+      ])
+    },
     enableSorting: false,
   },
   {
@@ -46,7 +57,22 @@ export const columns: ColumnDef<Stock>[] = [
     cell: ({ row }) => {
       const label = row.getValue('action') as string
       const actionType = getActionType(label)
-      return h(Badge, { class: actionStyles[actionType] }, () => label)
+      const status = actionStatuses.find(s => s.value === actionType)
+      if (!status)
+        return h('div', { }, label)
+
+      const style = {
+        color: status.color,
+      }
+
+      return h(Badge, {
+        class: 'flex items-center',
+        style,
+        variant: 'secondary',
+      }, () => [
+        status.icon && h(status.icon, { class: 'mr-2 h-4 w-4', style }),
+        h('span', label),
+      ])
     },
     filterFn: (row, id, value) => {
       const action = (row.getValue(id) as string).toLowerCase()
