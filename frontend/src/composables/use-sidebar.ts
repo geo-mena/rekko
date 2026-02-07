@@ -1,6 +1,7 @@
-import { BadgeHelp, BellDot, Boxes, Bug, Component, CreditCard, LayoutDashboard, Lightbulb, ListTodo, Palette, PictureInPicture2, Podcast, Settings, SquareUserRound, TrendingUp, User, Users, Wrench } from 'lucide-vue-next'
+import { CreditCard, LayoutDashboard, Lightbulb, PictureInPicture2, Settings, User } from 'lucide-vue-next'
 
 import type { NavGroup } from '@/components/app-sidebar/types'
+import type { TwoColAsideNavItem } from '@/components/global-layout/types'
 
 export function useSidebar() {
   const navData = ref<NavGroup[]> ([
@@ -27,8 +28,14 @@ export function useSidebar() {
     },
   ])
 
+  const settingsNavItems: TwoColAsideNavItem[] = [
+    { title: 'Profile', url: '/settings', icon: User },
+    { title: 'Account', url: '/settings/account', icon: Settings },
+  ]
+
   return {
     navData,
     otherPages,
+    settingsNavItems,
   }
 }

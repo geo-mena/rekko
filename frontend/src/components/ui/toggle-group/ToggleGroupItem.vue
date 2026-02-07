@@ -31,6 +31,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     :data-variant="context?.variant || variant"
     :data-size="context?.size || size"
     :data-spacing="context?.spacing"
+    :value="props.value"
     v-bind="forwardedProps"
     :class="cn(
       toggleVariants({
