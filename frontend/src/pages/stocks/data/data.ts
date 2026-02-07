@@ -1,39 +1,21 @@
 import type { FacetedFilterOption } from '@/components/data-table/types'
 
-export const actionTypes: (FacetedFilterOption & { style: string })[] = [
-  {
-    label: 'Upgraded',
-    value: 'upgraded',
-    style: 'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200',
-  },
-  {
-    label: 'Downgraded',
-    value: 'downgraded',
-    style: 'bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10',
-  },
-  {
-    label: 'Initiated',
-    value: 'initiated',
-    style: 'bg-sky-200/40 text-sky-900 dark:text-sky-100 border-sky-300',
-  },
-  {
-    label: 'Raised',
-    value: 'raised',
-    style: 'bg-emerald-100/30 text-emerald-900 dark:text-emerald-200 border-emerald-200',
-  },
-  {
-    label: 'Lowered',
-    value: 'lowered',
-    style: 'bg-orange-100/30 text-orange-900 dark:text-orange-200 border-orange-200',
-  },
-  {
-    label: 'Reiterated',
-    value: 'reiterated',
-    style: 'bg-violet-100/30 text-violet-900 dark:text-violet-200 border-violet-200',
-  },
-  {
-    label: 'Maintained',
-    value: 'maintained',
-    style: 'bg-neutral-300/40 border-neutral-300',
-  },
+export type ActionType = 'raised' | 'lowered' | 'default'
+
+export const actionStyles: Record<ActionType, string> = {
+  raised: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300 border-transparent',
+  lowered: 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:text-fuchsia-300 border-transparent',
+  default: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-transparent',
+}
+
+export function getActionType(action: string): ActionType {
+  const lowerAction = action.toLowerCase()
+  if (lowerAction.includes('target raised by')) return 'raised'
+  if (lowerAction.includes('target lowered by')) return 'lowered'
+  return 'default'
+}
+
+export const actionTypes: FacetedFilterOption[] = [
+  { label: 'Target Raised', value: 'target raised by' },
+  { label: 'Target Lowered', value: 'target lowered by' },
 ]

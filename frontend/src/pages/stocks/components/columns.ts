@@ -7,7 +7,7 @@ import Badge from '@/components/ui/badge/Badge.vue'
 
 import type { Stock } from '../data/schema'
 
-import { actionTypes } from '../data/data'
+import { actionStyles, getActionType } from '../data/data'
 import DataTableRowActions from './data-table-row-actions.vue'
 
 function formatPrice(value: number): string {
@@ -44,12 +44,14 @@ export const columns: ColumnDef<Stock>[] = [
     accessorKey: 'action',
     header: ({ column }) => h(DataTableColumnHeader<Stock>, { column, title: 'Action' }),
     cell: ({ row }) => {
-      const action = actionTypes.find(a => a.value === (row.getValue('action') as string).toLowerCase())
       const label = row.getValue('action') as string
-      if (!action) return h(Badge, { variant: 'outline' }, () => label)
-      return h(Badge, { class: action.style, variant: 'outline' }, () => label)
+      const actionType = getActionType(label)
+      return h(Badge, { class: actionStyles[actionType] }, () => label)
     },
-    filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    filterFn: (row, id, value) => {
+      const action = (row.getValue(id) as string).toLowerCase()
+      return value.some((v: string) => action.includes(v))
+    },
   },
   {
     id: 'rating',
