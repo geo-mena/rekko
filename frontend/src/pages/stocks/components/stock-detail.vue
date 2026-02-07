@@ -87,11 +87,5 @@ function formatDate(value: string): string {
         <p class="text-sm font-medium">{{ formatDate(stock.createdAt) }}</p>
       </div>
     </div>
-
-    <component :is="Modal.Footer">
-      <UiButton variant="outline" @click="emit('close')">
-        Close
-      </UiButton>
-    </component>
   </div>
 </template>
