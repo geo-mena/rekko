@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import { useAxios } from '@/composables/use-axios'
 import type { PaginatedStocks, Stock } from '@/pages/stocks/data/schema'
+import type { ApiPaginatedResponse, ApiResponse } from '@/services/types/response.type'
 
 export interface StockFilter {
   search?: string
@@ -29,8 +30,19 @@ export function useGetStocksQuery(filter: Ref<StockFilter>) {
       if (f.sortOrder) params.append('sortOrder', f.sortOrder)
       if (f.action) params.append('action', f.action)
 
-      const response = await axiosInstance.get(`/stocks?${params.toString()}`)
-      return response.data
+      const response = await axiosInstance.get<ApiPaginatedResponse<Stock[]>>(`/stocks?${params.toString()}`)
+      const { data, meta } = response.data
+      const { pagination } = meta
+
+      return {
+        data,
+        page: pagination.current_page,
+        limit: pagination.per_page,
+        totalCount: pagination.total_items,
+        totalPages: pagination.total_pages,
+        hasNext: pagination.has_next,
+        hasPrev: pagination.current_page > 1,
+      }
     },
   })
 }
@@ -41,8 +53,8 @@ export function useGetStockByIdQuery(id: Ref<string>) {
   return useQuery<Stock, AxiosError>({
     queryKey: ['stock', id],
     queryFn: async () => {
-      const response = await axiosInstance.get(`/stocks/${id.value}`)
-      return response.data
+      const response = await axiosInstance.get<ApiResponse<Stock>>(`/stocks/${id.value}`)
+      return response.data.data
     },
     enabled: () => !!id.value,
   })
@@ -54,7 +66,7 @@ export function useGetActionsQuery() {
   return useQuery<string[], AxiosError>({
     queryKey: ['stockActions'],
     queryFn: async () => {
-      const response = await axiosInstance.get('/stocks/actions')
+      const response = await axiosInstance.get<ApiResponse<string[]>>('/stocks/actions')
       return response.data.data
     },
   })
@@ -67,8 +79,9 @@ export function useSyncStocksMutation() {
   return useMutation<{ message: string, count: number }, AxiosError>({
     mutationKey: ['syncStocks'],
     mutationFn: async () => {
-      const response = await axiosInstance.post('/sync')
-      return response.data
+      const response = await axiosInstance.post<ApiResponse<{ count: number }>>('/sync')
+      const { message, data } = response.data
+      return { message, count: data.count }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stocks'] })
