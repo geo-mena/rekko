@@ -43,7 +43,7 @@ function handleSync() {
                 <CommandMenuPanel />
                 <div class="flex-1" />
                 <div class="ml-auto flex items-center space-x-4">
-                    <UiButton variant="outline" :disabled="isSyncing" @click="handleSync">
+                    <UiButton variant="outline" class="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-400 dark:hover:text-slate-900" :disabled="isSyncing" @click="handleSync">
                         <Loader v-if="isSyncing" class="animate-spin" />
                         <RefreshCw v-else />
                         Sync Data
