@@ -9,11 +9,11 @@ import { setupRouter } from './router/setup'
 import { setupTanstackVueQuery } from './tanstack-vue-query/setup'
 
 export function setupPlugins(app: App) {
-  setupDayjs()
-  setupNProgress()
-  setupAutoAnimate(app)
-  setupTanstackVueQuery(app)
-  setupI18n(app)
-  setupPinia(app)
-  setupRouter(app)
+    setupDayjs()
+    setupNProgress()
+    setupAutoAnimate(app)
+    setupTanstackVueQuery(app)
+    setupI18n(app)
+    setupPinia(app)
+    setupRouter(app)
 }

@@ -8,9 +8,9 @@ router.push({ name: '/dashboard/' })
 </script>
 
 <template>
-  <div class="flex items-center justify-center w-screen h-screen">
-    <Loading />
-  </div>
+    <div class="flex items-center justify-center w-screen h-screen">
+        <Loading />
+    </div>
 </template>
 
 <route lang="yaml">

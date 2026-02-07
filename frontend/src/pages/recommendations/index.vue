@@ -11,13 +11,13 @@ const recommendations = computed(() => data.value ?? [])
 </script>
 
 <template>
-  <BasicPage
-    title="Recommendations"
-    description="AI-powered stock recommendations based on analyst data"
-    sticky
-  >
-    <div class="overflow-x-auto">
-      <DataTable :loading="isLoading" :data="recommendations" :columns="columns" />
-    </div>
-  </BasicPage>
+    <BasicPage
+        title="Recommendations"
+        description="AI-powered stock recommendations based on analyst data"
+        sticky
+    >
+        <div class="overflow-x-auto">
+            <DataTable :loading="isLoading" :data="recommendations" :columns="columns" />
+        </div>
+    </BasicPage>
 </template>

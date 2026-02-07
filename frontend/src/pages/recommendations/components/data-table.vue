@@ -14,9 +14,9 @@ const table = generateVueTable<StockRecommendation>(props)
 </script>
 
 <template>
-  <DataTable :columns :data :loading :table>
-    <template #toolbar>
-      <DataTableToolbar :table class="w-full overflow-x-auto" />
-    </template>
-  </DataTable>
+    <DataTable :columns :data :loading :table>
+        <template #toolbar>
+            <DataTableToolbar :table class="w-full overflow-x-auto" />
+        </template>
+    </DataTable>
 </template>

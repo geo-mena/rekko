@@ -4,7 +4,7 @@ import SettingsLayout from './components/settings-layout.vue'
 </script>
 
 <template>
-  <SettingsLayout>
-    <NotificationsForm />
-  </SettingsLayout>
+    <SettingsLayout>
+        <NotificationsForm />
+    </SettingsLayout>
 </template>

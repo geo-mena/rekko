@@ -7,5 +7,5 @@ import billings from './data/billings.json'
 </script>
 
 <template>
-  <DataTable :data="billings as unknown as Billing[]" :columns />
+    <DataTable :data="billings as unknown as Billing[]" :columns />
 </template>

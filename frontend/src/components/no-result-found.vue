@@ -5,15 +5,15 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
 </script>
 
 <template>
-  <Empty>
-    <EmptyHeader>
-      <EmptyMedia variant="icon">
-        <FolderOpenIcon />
-      </EmptyMedia>
-      <EmptyTitle>No result found.</EmptyTitle>
-      <EmptyDescription>
-        Please try a different search term or check the spelling.
-      </EmptyDescription>
-    </EmptyHeader>
-  </Empty>
+    <Empty>
+        <EmptyHeader>
+            <EmptyMedia variant="icon">
+                <FolderOpenIcon />
+            </EmptyMedia>
+            <EmptyTitle>No result found.</EmptyTitle>
+            <EmptyDescription>
+                Please try a different search term or check the spelling.
+            </EmptyDescription>
+        </EmptyHeader>
+    </Empty>
 </template>

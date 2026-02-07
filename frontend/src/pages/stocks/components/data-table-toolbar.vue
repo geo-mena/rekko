@@ -14,7 +14,7 @@ import type { Stock } from '../data/schema'
 import { actionTypes } from '../data/data'
 
 interface DataTableToolbarProps {
-  table: Table<Stock>
+    table: Table<Stock>
 }
 
 const props = defineProps<DataTableToolbarProps>()
@@ -24,36 +24,36 @@ const search = defineModel<string>('search', { default: '' })
 const isFiltered = computed(() => search.value.length > 0 || props.table.getState().columnFilters.length > 0)
 
 function resetFilters() {
-  search.value = ''
-  props.table.resetColumnFilters()
+    search.value = ''
+    props.table.resetColumnFilters()
 }
 </script>
 
 <template>
-  <div class="flex items-center justify-between">
-    <div class="flex items-center flex-1 space-x-2">
-      <Input
-        v-model="search"
-        placeholder="Search by ticker or company..."
-        class="h-8 w-[150px] lg:w-[250px]"
-      />
-      <DataTableFacetedFilter
-        v-if="table.getColumn('action')"
-        :column="table.getColumn('action')"
-        title="Action"
-        :options="actionTypes"
-      />
+    <div class="flex items-center justify-between">
+        <div class="flex items-center flex-1 space-x-2">
+            <Input
+                v-model="search"
+                placeholder="Search by ticker or company..."
+                class="h-8 w-[150px] lg:w-[250px]"
+            />
+            <DataTableFacetedFilter
+                v-if="table.getColumn('action')"
+                :column="table.getColumn('action')"
+                title="Action"
+                :options="actionTypes"
+            />
 
-      <Button
-        v-if="isFiltered"
-        variant="ghost"
-        class="h-8 px-2 lg:px-3"
-        @click="resetFilters()"
-      >
-        Reset
-        <X class="size-4 ml-2" />
-      </Button>
+            <Button
+                v-if="isFiltered"
+                variant="ghost"
+                class="h-8 px-2 lg:px-3"
+                @click="resetFilters()"
+            >
+                Reset
+                <X class="size-4 ml-2" />
+            </Button>
+        </div>
+        <DataTableViewOptions :table="table" />
     </div>
-    <DataTableViewOptions :table="table" />
-  </div>
 </template>

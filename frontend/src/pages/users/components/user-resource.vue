@@ -6,7 +6,7 @@ import type { User } from '../data/schema'
 import UserForm from './user-form.vue'
 
 const props = defineProps<{
-  user?: User
+    user?: User
 }>()
 defineEmits(['close'])
 
@@ -17,16 +17,16 @@ const { Modal } = useModal()
 </script>
 
 <template>
-  <div>
-    <component :is="Modal.Header">
-      <component :is="Modal.Title">
-        {{ title }}
-      </component>
-      <component :is="Modal.Description">
-        {{ description }}
-      </component>
-    </component>
+    <div>
+        <component :is="Modal.Header">
+            <component :is="Modal.Title">
+                {{ title }}
+            </component>
+            <component :is="Modal.Description">
+                {{ description }}
+            </component>
+        </component>
 
-    <UserForm :user="user" @close="$emit('close')" />
-  </div>
+        <UserForm :user="user" @close="$emit('close')" />
+    </div>
 </template>

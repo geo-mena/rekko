@@ -14,52 +14,52 @@ import Layouts from 'vite-plugin-vue-layouts'
 const RouteGenerateExclude = ['**/components/**', '**/layouts/**', '**/data/**', '**/types/**']
 
 export default defineConfig({
-  plugins: [
-    VueRouter({
-      exclude: RouteGenerateExclude,
-      dts: 'src/types/typed-router.d.ts',
-    }),
-    vue(),
-    vueJsx(),
-    vueDevTools(),
-    tailwindcss(),
-    visualizer({ gzipSize: true, brotliSize: true }),
-    Layouts({
-      defaultLayout: 'default',
-    }),
-    AutoImport({
-      include: [
-        /\.[tj]sx?$/,
-        /\.vue$/,
-      ],
-      imports: [
-        'vue',
-        VueRouterAutoImports,
-      ],
-      dirs: [
-        'src/composables/**/*.ts',
-        'src/constants/**/*.ts',
-        'src/stores/**/*.ts',
-      ],
-      defaultExportByFilename: true,
-      dts: 'src/types/auto-import.d.ts',
-    }),
-    Component({
-      dirs: [
-        'src/components',
-      ],
-      collapseSamePrefixes: true,
-      directoryAsNamespace: true,
-      dts: 'src/types/auto-import-components.d.ts',
-    }),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    plugins: [
+        VueRouter({
+            exclude: RouteGenerateExclude,
+            dts: 'src/types/typed-router.d.ts',
+        }),
+        vue(),
+        vueJsx(),
+        vueDevTools(),
+        tailwindcss(),
+        visualizer({ gzipSize: true, brotliSize: true }),
+        Layouts({
+            defaultLayout: 'default',
+        }),
+        AutoImport({
+            include: [
+                /\.[tj]sx?$/,
+                /\.vue$/,
+            ],
+            imports: [
+                'vue',
+                VueRouterAutoImports,
+            ],
+            dirs: [
+                'src/composables/**/*.ts',
+                'src/constants/**/*.ts',
+                'src/stores/**/*.ts',
+            ],
+            defaultExportByFilename: true,
+            dts: 'src/types/auto-import.d.ts',
+        }),
+        Component({
+            dirs: [
+                'src/components',
+            ],
+            collapseSamePrefixes: true,
+            directoryAsNamespace: true,
+            dts: 'src/types/auto-import-components.d.ts',
+        }),
+    ],
+    resolve: {
+        alias: {
+            '@': fileURLToPath(new URL('./src', import.meta.url)),
+        },
     },
-  },
-  esbuild: {
-    drop: ['debugger'],
-    pure: ['console.log'],
-  },
+    esbuild: {
+        drop: ['debugger'],
+        pure: ['console.log'],
+    },
 })

@@ -5,7 +5,7 @@ import OverviewContent from './components/overview-content.vue'
 </script>
 
 <template>
-  <BasicPage title="Dashboard" description="Stock market overview and recommendations" sticky>
-    <OverviewContent />
-  </BasicPage>
+    <BasicPage title="Dashboard" description="Stock market overview and recommendations" sticky>
+        <OverviewContent />
+    </BasicPage>
 </template>

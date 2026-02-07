@@ -13,17 +13,17 @@ const { data: recommendations, isLoading: recsLoading } = useGetRecommendationsQ
 </script>
 
 <template>
-  <div class="space-y-4">
-    <KpiCards
-      :stats="stats"
-      :top-pick="topPick"
-      :recommendations="recommendations"
-      :loading="statsLoading || topPickLoading || recsLoading"
-    />
+    <div class="space-y-4">
+        <KpiCards
+            :stats="stats"
+            :top-pick="topPick"
+            :recommendations="recommendations"
+            :loading="statsLoading || topPickLoading || recsLoading"
+        />
 
-<TopRecommendations
-      :recommendations="recommendations ?? []"
-      :loading="recsLoading"
-    />
-  </div>
+        <TopRecommendations
+            :recommendations="recommendations ?? []"
+            :loading="recsLoading"
+        />
+    </div>
 </template>

@@ -9,7 +9,7 @@ import { useModal } from '@/composables/use-modal'
 import type { StockRecommendation } from '../data/schema'
 
 interface DataTableRowActionsProps {
-  row: Row<StockRecommendation>
+    row: Row<StockRecommendation>
 }
 const props = defineProps<DataTableRowActionsProps>()
 const recommendation = computed(() => props.row.original)
@@ -18,35 +18,35 @@ const isOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
 
 function handleSelect() {
-  showComponent.value = defineAsyncComponent(() => import('./recommendation-detail.vue'))
+    showComponent.value = defineAsyncComponent(() => import('./recommendation-detail.vue'))
 }
 
 const { contentClass, Modal } = useModal()
 </script>
 
 <template>
-  <component :is="Modal.Root" v-model:open="isOpen">
-    <UiDropdownMenu>
-      <UiDropdownMenuTrigger as-child>
-        <UiButton
-          variant="ghost"
-          class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <Ellipsis class="size-4" />
-          <span class="sr-only">Open menu</span>
-        </UiButton>
-      </UiDropdownMenuTrigger>
-      <UiDropdownMenuContent align="end" class="w-[160px]">
-        <component :is="Modal.Trigger" as-child>
-          <UiDropdownMenuItem @click.stop="handleSelect()">
-            View Details
-          </UiDropdownMenuItem>
-        </component>
-      </UiDropdownMenuContent>
-    </UiDropdownMenu>
+    <component :is="Modal.Root" v-model:open="isOpen">
+        <UiDropdownMenu>
+            <UiDropdownMenuTrigger as-child>
+                <UiButton
+                    variant="ghost"
+                    class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                >
+                    <Ellipsis class="size-4" />
+                    <span class="sr-only">Open menu</span>
+                </UiButton>
+            </UiDropdownMenuTrigger>
+            <UiDropdownMenuContent align="end" class="w-[160px]">
+                <component :is="Modal.Trigger" as-child>
+                    <UiDropdownMenuItem @click.stop="handleSelect()">
+                        View Details
+                    </UiDropdownMenuItem>
+                </component>
+            </UiDropdownMenuContent>
+        </UiDropdownMenu>
 
-    <component :is="Modal.Content" :class="contentClass">
-      <component :is="showComponent" :recommendation="recommendation" @close="isOpen = false" />
+        <component :is="Modal.Content" :class="contentClass">
+            <component :is="showComponent" :recommendation="recommendation" @close="isOpen = false" />
+        </component>
     </component>
-  </component>
 </template>

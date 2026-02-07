@@ -20,11 +20,11 @@
 ## Build / Generation (Vite)
 
 - `vite.config.ts`
-  - Alias: `@` -> `src/`
-  - Route generation: `unplugin-vue-router` (types: `src/types/typed-router.d.ts`)
-  - Layouts: `vite-plugin-vue-layouts` (default: `default`)
-  - Auto-import: `src/composables` / `src/constants` / `src/stores` (types: `src/types/auto-import.d.ts`)
-  - Components: `src/components` (types: `src/types/auto-import-components.d.ts`)
+    - Alias: `@` -> `src/`
+    - Route generation: `unplugin-vue-router` (types: `src/types/typed-router.d.ts`)
+    - Layouts: `vite-plugin-vue-layouts` (default: `default`)
+    - Auto-import: `src/composables` / `src/constants` / `src/stores` (types: `src/types/auto-import.d.ts`)
+    - Components: `src/components` (types: `src/types/auto-import-components.d.ts`)
 
 ## Routing & Layouts
 

@@ -9,17 +9,17 @@ import tasks from './data/tasks.json'
 </script>
 
 <template>
-  <BasicPage
-    title="Tasks"
-    description="Tasks description"
-    sticky
-  >
-    <template #actions>
-      <TaskImport />
-      <TaskCreate />
-    </template>
-    <div class="overflow-x-auto">
-      <DataTable :data="tasks" :columns="columns" />
-    </div>
-  </BasicPage>
+    <BasicPage
+        title="Tasks"
+        description="Tasks description"
+        sticky
+    >
+        <template #actions>
+            <TaskImport />
+            <TaskCreate />
+        </template>
+        <div class="overflow-x-auto">
+            <DataTable :data="tasks" :columns="columns" />
+        </div>
+    </BasicPage>
 </template>

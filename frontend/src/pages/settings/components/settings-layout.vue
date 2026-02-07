@@ -5,16 +5,16 @@ const { settingsNavItems } = useSidebar()
 </script>
 
 <template>
-  <BasicPage
-    title="Settings"
-    description="Manage your store settings."
-  >
-    <TwoColLayout>
-      <template #aside>
-        <TwoColAside :nav="settingsNavItems" />
-      </template>
+    <BasicPage
+        title="Settings"
+        description="Manage your store settings."
+    >
+        <TwoColLayout>
+            <template #aside>
+                <TwoColAside :nav="settingsNavItems" />
+            </template>
 
-      <slot />
-    </TwoColLayout>
-  </BasicPage>
+            <slot />
+        </TwoColLayout>
+    </BasicPage>
 </template>

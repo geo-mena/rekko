@@ -7,12 +7,12 @@ import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 import { createRouterGuard } from './guard'
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes: setupLayouts(routes as RouteRecordRaw[]),
+    history: createWebHistory(),
+    routes: setupLayouts(routes as RouteRecordRaw[]),
 
-  scrollBehavior() {
-    return { left: 0, top: 0, behavior: 'smooth' }
-  },
+    scrollBehavior() {
+        return { left: 0, top: 0, behavior: 'smooth' }
+    },
 })
 
 createRouterGuard(router)
@@ -20,5 +20,5 @@ createRouterGuard(router)
 export default router
 
 if (import.meta.hot) {
-  handleHotUpdate(router)
+    handleHotUpdate(router)
 }

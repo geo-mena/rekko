@@ -10,18 +10,18 @@ const { Modal, contentClass } = useModal()
 </script>
 
 <template>
-  <component :is="Modal.Root" v-model:open="isOpen">
-    <component :is="Modal.Trigger" as-child>
-      <UiButton>
-        <UserRoundPlus />
-        Create User
-      </UiButton>
-    </component>
+    <component :is="Modal.Root" v-model:open="isOpen">
+        <component :is="Modal.Trigger" as-child>
+            <UiButton>
+                <UserRoundPlus />
+                Create User
+            </UiButton>
+        </component>
 
-    <component
-      :is="Modal.Content" :class="contentClass"
-    >
-      <UserResource @close="isOpen = false" />
+        <component
+            :is="Modal.Content" :class="contentClass"
+        >
+            <UserResource @close="isOpen = false" />
+        </component>
     </component>
-  </component>
 </template>

@@ -3,8 +3,8 @@ import 'vue-router'
 export {}
 
 declare module 'vue-router' {
-  interface RouteMeta {
+    interface RouteMeta {
     // if true, need user login
-    auth?: boolean
-  }
+        auth?: boolean
+    }
 }

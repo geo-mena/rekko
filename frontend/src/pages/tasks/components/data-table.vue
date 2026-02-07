@@ -19,35 +19,35 @@ const taskDeleteBatchOpen = ref(false)
 </script>
 
 <template>
-  <BulkActions entity-name="task" :table>
-    <UiTooltip>
-      <UiTooltipTrigger as-child>
-        <UiButton
-          variant="destructive"
-          size="icon"
-          class="size-8"
-          aria-label="Delete selected tasks"
-          title="Delete selected tasks"
-          @click="taskDeleteBatchOpen = true"
-        >
-          <Trash2Icon />
-          <span class="sr-only">Delete selected tasks</span>
-        </UiButton>
-      </UiTooltipTrigger>
-      <UiTooltipContent>
-        <p>Delete selected tasks</p>
-      </UiTooltipContent>
-    </UiTooltip>
+    <BulkActions entity-name="task" :table>
+        <UiTooltip>
+            <UiTooltipTrigger as-child>
+                <UiButton
+                    variant="destructive"
+                    size="icon"
+                    class="size-8"
+                    aria-label="Delete selected tasks"
+                    title="Delete selected tasks"
+                    @click="taskDeleteBatchOpen = true"
+                >
+                    <Trash2Icon />
+                    <span class="sr-only">Delete selected tasks</span>
+                </UiButton>
+            </UiTooltipTrigger>
+            <UiTooltipContent>
+                <p>Delete selected tasks</p>
+            </UiTooltipContent>
+        </UiTooltip>
 
-    <TaskDeleteBatch
-      v-model:open="taskDeleteBatchOpen"
-      :table
-    />
-  </BulkActions>
+        <TaskDeleteBatch
+            v-model:open="taskDeleteBatchOpen"
+            :table
+        />
+    </BulkActions>
 
-  <DataTable :columns :table :data :loading>
-    <template #toolbar>
-      <DataTableToolbar :table="table" class="w-full overflow-x-auto" />
-    </template>
-  </DataTable>
+    <DataTable :columns :table :data :loading>
+        <template #toolbar>
+            <DataTableToolbar :table="table" class="w-full overflow-x-auto" />
+        </template>
+    </DataTable>
 </template>

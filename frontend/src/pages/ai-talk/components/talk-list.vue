@@ -4,18 +4,18 @@ import type { IMessage } from '../types'
 import TalkItem from './talk-item.vue'
 
 interface Props {
-  talks: IMessage[]
+    talks: IMessage[]
 }
 
 defineProps<Props>()
 </script>
 
 <template>
-  <div class="">
-    <TalkItem
-      v-for="talk, index in talks" :key="`${index}${talk.content}`"
-      :talk="talk"
-      class="mb-2"
-    />
-  </div>
+    <div class="">
+        <TalkItem
+            v-for="talk, index in talks" :key="`${index}${talk.content}`"
+            :talk="talk"
+            class="mb-2"
+        />
+    </div>
 </template>

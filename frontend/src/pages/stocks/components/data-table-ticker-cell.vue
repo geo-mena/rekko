@@ -7,7 +7,7 @@ import { useModal } from '@/composables/use-modal'
 import type { Stock } from '../data/schema'
 
 interface DataTableTickerCellProps {
-  row: Row<Stock>
+    row: Row<Stock>
 }
 const props = defineProps<DataTableTickerCellProps>()
 const stock = computed(() => props.row.original)
@@ -17,25 +17,25 @@ const isOpen = ref(false)
 const showComponent = shallowRef<Component | null>(null)
 
 function handleClick() {
-  showComponent.value = defineAsyncComponent(() => import('./stock-detail.vue'))
-  isOpen.value = true
+    showComponent.value = defineAsyncComponent(() => import('./stock-detail.vue'))
+    isOpen.value = true
 }
 
 const { contentClass, Modal } = useModal()
 </script>
 
 <template>
-  <component :is="Modal.Root" v-model:open="isOpen">
-    <button
-      type="button"
-      class="font-semibold text-primary hover:underline cursor-pointer"
-      @click="handleClick"
-    >
-      {{ ticker }}
-    </button>
+    <component :is="Modal.Root" v-model:open="isOpen">
+        <button
+            type="button"
+            class="font-semibold text-primary hover:underline cursor-pointer"
+            @click="handleClick"
+        >
+            {{ ticker }}
+        </button>
 
-    <component :is="Modal.Content" :class="contentClass">
-      <component :is="showComponent" :stock="stock" @close="isOpen = false" />
+        <component :is="Modal.Content" :class="contentClass">
+            <component :is="showComponent" :stock="stock" @close="isOpen = false" />
+        </component>
     </component>
-  </component>
 </template>

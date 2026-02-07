@@ -10,16 +10,16 @@ const { Modal, contentClass } = useModal()
 </script>
 
 <template>
-  <component :is="Modal.Root" v-model:open="isOpen">
-    <component :is="Modal.Trigger" as-child>
-      <UiButton>
-        Create
-        <Plus />
-      </UiButton>
-    </component>
+    <component :is="Modal.Root" v-model:open="isOpen">
+        <component :is="Modal.Trigger" as-child>
+            <UiButton>
+                Create
+                <Plus />
+            </UiButton>
+        </component>
 
-    <component :is="Modal.Content" :class="contentClass">
-      <TaskResourceDialog :task="null" @close="isOpen = false" />
+        <component :is="Modal.Content" :class="contentClass">
+            <TaskResourceDialog :task="null" @close="isOpen = false" />
+        </component>
     </component>
-  </component>
 </template>

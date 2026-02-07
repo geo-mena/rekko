@@ -16,9 +16,9 @@ const table = generateVueTable<Stock>(props)
 </script>
 
 <template>
-  <DataTable :columns :data :loading :table :server-pagination="serverPagination">
-    <template #toolbar>
-      <DataTableToolbar v-model:search="search" :table class="w-full overflow-x-auto" />
-    </template>
-  </DataTable>
+    <DataTable :columns :data :loading :table :server-pagination="serverPagination">
+        <template #toolbar>
+            <DataTableToolbar v-model:search="search" :table class="w-full overflow-x-auto" />
+        </template>
+    </DataTable>
 </template>

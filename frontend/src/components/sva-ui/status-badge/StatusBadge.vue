@@ -11,16 +11,16 @@ import type { StatusVariants } from '.'
 import Status from './Status.vue'
 
 const props = defineProps<{
-  variant?: BadgeVariants['variant']
-  rounded?: StatusVariants['rounded']
-  class?: HTMLAttributes['class']
-  color?: StatusVariants['color']
+    variant?: BadgeVariants['variant']
+    rounded?: StatusVariants['rounded']
+    class?: HTMLAttributes['class']
+    color?: StatusVariants['color']
 }>()
 </script>
 
 <template>
-  <div :class="cn(badgeVariants({ variant }), props.class)">
-    <Status :color="props.color" :rounded="props.rounded" />
-    <slot />
-  </div>
+    <div :class="cn(badgeVariants({ variant }), props.class)">
+        <Status :color="props.color" :rounded="props.rounded" />
+        <slot />
+    </div>
 </template>

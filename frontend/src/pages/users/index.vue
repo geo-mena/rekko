@@ -12,28 +12,28 @@ import { users } from './data/users'
 const loading = ref(false)
 
 function mockLoading() {
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-  }, 2000)
+    loading.value = true
+    setTimeout(() => {
+        loading.value = false
+    }, 2000)
 }
 </script>
 
 <template>
-  <BasicPage
-    title="Users"
-    description="Users description"
-    sticky
-  >
-    <template #actions>
-      <UserInvite />
-      <UserCreate />
-      <UiButton variant="outline" @click="mockLoading">
-        <Loader />Mock Loading
-      </UiButton>
-    </template>
-    <div class="overflow-x-auto">
-      <DataTable :loading :data="users" :columns="columns" />
-    </div>
-  </BasicPage>
+    <BasicPage
+        title="Users"
+        description="Users description"
+        sticky
+    >
+        <template #actions>
+            <UserInvite />
+            <UserCreate />
+            <UiButton variant="outline" @click="mockLoading">
+                <Loader />Mock Loading
+            </UiButton>
+        </template>
+        <div class="overflow-x-auto">
+            <DataTable :loading :data="users" :columns="columns" />
+        </div>
+    </BasicPage>
 </template>

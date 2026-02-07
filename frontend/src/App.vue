@@ -7,15 +7,15 @@ useSystemTheme()
 </script>
 
 <template>
-  <Toaster />
+    <Toaster />
 
-  <Suspense>
-    <router-view v-slot="{ Component, route }">
-      <component :is="Component" :key="route" />
-    </router-view>
+    <Suspense>
+        <router-view v-slot="{ Component, route }">
+            <component :is="Component" :key="route" />
+        </router-view>
 
-    <template #fallback>
-      <Loading />
-    </template>
-  </Suspense>
+        <template #fallback>
+            <Loading />
+        </template>
+    </Suspense>
 </template>

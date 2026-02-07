@@ -8,30 +8,30 @@ import Setup from '@/components/marketing/setup.vue'
 </script>
 
 <template>
-  <div>
-    <main class="mt-18">
-      <Hero />
-    </main>
+    <div>
+        <main class="mt-18">
+            <Hero />
+        </main>
 
-    <main class="mt-8">
-      <Logos />
-    </main>
+        <main class="mt-8">
+            <Logos />
+        </main>
 
-    <main class="mt-18">
-      <Features />
-    </main>
+        <main class="mt-18">
+            <Features />
+        </main>
 
-    <main class="mt-18">
-      <Evaluation />
-    </main>
-    <main class="mt-18">
-      <PricingPlans />
-    </main>
+        <main class="mt-18">
+            <Evaluation />
+        </main>
+        <main class="mt-18">
+            <PricingPlans />
+        </main>
 
-    <main class="mt-18">
-      <Setup />
-    </main>
-  </div>
+        <main class="mt-18">
+            <Setup />
+        </main>
+    </div>
 </template>
 
 <route lang="yaml">

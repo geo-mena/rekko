@@ -7,17 +7,17 @@ import StatusBadge from './components/status-badge.vue'
 </script>
 
 <template>
-  <BasicPage
-    title="SVA Components"
-    description="shadcn-vue-admin custom components"
-    sticky
-  >
-    <div class="flex flex-col gap-4">
-      <StatusBadge />
+    <BasicPage
+        title="SVA Components"
+        description="shadcn-vue-admin custom components"
+        sticky
+    >
+        <div class="flex flex-col gap-4">
+            <StatusBadge />
 
-      <Copy />
+            <Copy />
 
-      <InlineTip />
-    </div>
-  </BasicPage>
+            <InlineTip />
+        </div>
+    </BasicPage>
 </template>

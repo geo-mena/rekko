@@ -11,62 +11,62 @@ const emit = defineEmits(['submit', 'typeChange'])
 const text = ref('')
 
 function handleTypeChange(type: string) {
-  emit('typeChange', type)
+    emit('typeChange', type)
 }
 
 function handleSubmit() {
-  emit('submit', text.value)
-  nextTick(() => text.value = '')
+    emit('submit', text.value)
+    nextTick(() => text.value = '')
 }
 </script>
 
 <template>
-  <InputGroup>
-    <InputGroupTextarea v-model="text" placeholder="Ask, Search or Chat..." />
-    <InputGroupAddon align="block-end">
-      <TalkType @update:type="handleTypeChange" />
+    <InputGroup>
+        <InputGroupTextarea v-model="text" placeholder="Ask, Search or Chat..." />
+        <InputGroupAddon align="block-end">
+            <TalkType @update:type="handleTypeChange" />
 
-      <InputGroupButton
-        variant="ghost"
-        class="rounded-full"
-        size="icon-xs"
-      >
-        <Paperclip class="size-4" />
-        <span class="sr-only">Add File</span>
-      </InputGroupButton>
+            <InputGroupButton
+                variant="ghost"
+                class="rounded-full"
+                size="icon-xs"
+            >
+                <Paperclip class="size-4" />
+                <span class="sr-only">Add File</span>
+            </InputGroupButton>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <InputGroupButton variant="ghost">
-            Auto
-          </InputGroupButton>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          side="top"
-          align="start"
-          class="[--radius:0.95rem]"
-        >
-          <DropdownMenuItem>Auto</DropdownMenuItem>
-          <DropdownMenuItem>Agent</DropdownMenuItem>
-          <DropdownMenuItem>Manual</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                    <InputGroupButton variant="ghost">
+                        Auto
+                    </InputGroupButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                    side="top"
+                    align="start"
+                    class="[--radius:0.95rem]"
+                >
+                    <DropdownMenuItem>Auto</DropdownMenuItem>
+                    <DropdownMenuItem>Agent</DropdownMenuItem>
+                    <DropdownMenuItem>Manual</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
-      <InputGroupText class="ml-auto">
-        52% used
-      </InputGroupText>
-      <Separator orientation="vertical" class="h-4!" />
+            <InputGroupText class="ml-auto">
+                52% used
+            </InputGroupText>
+            <Separator orientation="vertical" class="h-4!" />
 
-      <InputGroupButton
-        variant="default"
-        class="rounded-full"
-        size="icon-xs"
-        :disabled="!text"
-        @click="handleSubmit"
-      >
-        <ArrowUpIcon class="size-4" />
-        <span class="sr-only">Add File</span>
-      </InputGroupButton>
-    </InputGroupAddon>
-  </InputGroup>
+            <InputGroupButton
+                variant="default"
+                class="rounded-full"
+                size="icon-xs"
+                :disabled="!text"
+                @click="handleSubmit"
+            >
+                <ArrowUpIcon class="size-4" />
+                <span class="sr-only">Add File</span>
+            </InputGroupButton>
+        </InputGroupAddon>
+    </InputGroup>
 </template>
