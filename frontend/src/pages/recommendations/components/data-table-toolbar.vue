@@ -4,10 +4,12 @@ import type { Table } from '@tanstack/vue-table'
 import { X } from 'lucide-vue-next'
 import { computed } from 'vue'
 
+import DataTableFacetedFilter from '@/components/data-table/faceted-filter.vue'
 import DataTableViewOptions from '@/components/data-table/view-options.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
+import { scoreTypes } from '../data/data'
 import type { StockRecommendation } from '../data/schema'
 
 interface DataTableToolbarProps {
@@ -27,6 +29,12 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
                 :model-value="(table.getColumn('ticker')?.getFilterValue() as string) ?? ''"
                 class="h-8 w-[150px] lg:w-[250px]"
                 @input="table.getColumn('ticker')?.setFilterValue($event.target.value)"
+            />
+            <DataTableFacetedFilter
+                v-if="table.getColumn('score')"
+                :column="table.getColumn('score')"
+                title="Score"
+                :options="scoreTypes"
             />
 
             <Button

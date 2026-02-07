@@ -52,6 +52,18 @@ export const columns: ColumnDef<StockRecommendation>[] = [
                 h('span', `${score}/10`),
             ])
         },
+        filterFn: (row, id, value: string[]) => {
+            const score = row.getValue(id) as number
+            return value.some((v) => {
+                if (v === 'high')
+                    return score >= 7
+                if (v === 'medium')
+                    return score >= 5 && score < 7
+                if (v === 'low')
+                    return score >= 1 && score < 5
+                return false
+            })
+        },
         enableSorting: true,
     },
     {
