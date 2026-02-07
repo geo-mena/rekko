@@ -10,13 +10,15 @@ import DataTableToolbar from './data-table-toolbar.vue'
 
 const props = defineProps<DataTableProps<Stock>>()
 
+const search = defineModel<string>('search', { default: '' })
+
 const table = generateVueTable<Stock>(props)
 </script>
 
 <template>
   <DataTable :columns :data :loading :table :server-pagination="serverPagination">
     <template #toolbar>
-      <DataTableToolbar :table class="w-full overflow-x-auto" />
+      <DataTableToolbar v-model:search="search" :table class="w-full overflow-x-auto" />
     </template>
   </DataTable>
 </template>
