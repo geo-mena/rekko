@@ -3,7 +3,6 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
 
 import DataTableColumnHeader from '@/components/data-table/column-header.vue'
-import { SelectColumn } from '@/components/data-table/table-columns'
 import Badge from '@/components/ui/badge/Badge.vue'
 
 import type { Stock } from '../data/schema'
@@ -22,7 +21,6 @@ function formatDate(value: string): string {
 }
 
 export const columns: ColumnDef<Stock>[] = [
-  SelectColumn as ColumnDef<Stock>,
   {
     accessorKey: 'ticker',
     header: ({ column }) => h(DataTableColumnHeader<Stock>, { column, title: 'Ticker' }),
