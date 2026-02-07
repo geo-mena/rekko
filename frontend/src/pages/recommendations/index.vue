@@ -22,7 +22,7 @@ const recommendations = computed(() => data.value ?? [])
 
 <template>
     <BasicPage
-        title="Recommendations"
+        title="Top Picks"
         description="AI-powered stock recommendations based on analyst data"
         sticky
     >

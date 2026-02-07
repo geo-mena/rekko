@@ -10,7 +10,7 @@ export function useSidebar() {
             items: [
                 { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
                 { title: 'Stocks', url: '/stocks', icon: PictureInPicture2 },
-                { title: 'Recommendations', url: '/recommendations', icon: Lightbulb },
+                { title: 'Top Picks', url: '/recommendations', icon: Lightbulb },
             ],
         },
     ])
