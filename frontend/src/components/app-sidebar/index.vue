@@ -7,7 +7,7 @@ import TeamSwitcher from './team-switcher.vue'
 <template>
     <UiSidebar variant="floating" collapsible="icon" class="z-50">
         <UiSidebarHeader>
-            <TeamSwitcher :teams="sidebarData.teams" />
+            <TeamSwitcher />
         </UiSidebarHeader>
 
         <UiSidebarContent>
