@@ -66,9 +66,9 @@ func NewRecommendationUsecase(stockRepo repository.StockRepository) *Recommendat
 	return &RecommendationUsecase{stockRepo: stockRepo}
 }
 
-func (u *RecommendationUsecase) GetTopRecommendations(ctx context.Context, limit int) ([]domain.StockRecommendation, error) {
-	if limit < 1 || limit > 50 {
-		limit = 10
+func (u *RecommendationUsecase) GetTopRecommendations(ctx context.Context, limit int, search string) ([]domain.StockRecommendation, error) {
+	if limit < 1 || limit > 100 {
+		limit = 50
 	}
 
 	filter := domain.StockFilter{
@@ -76,6 +76,7 @@ func (u *RecommendationUsecase) GetTopRecommendations(ctx context.Context, limit
 		Limit:     500,
 		SortBy:    "created_at",
 		SortOrder: "desc",
+		Search:    search,
 	}
 
 	stocks, _, err := u.stockRepo.FindAll(ctx, filter)
@@ -97,7 +98,7 @@ func (u *RecommendationUsecase) GetTopRecommendations(ctx context.Context, limit
 }
 
 func (u *RecommendationUsecase) GetBestStock(ctx context.Context) (*domain.StockRecommendation, error) {
-	recommendations, err := u.GetTopRecommendations(ctx, 1)
+	recommendations, err := u.GetTopRecommendations(ctx, 1, "")
 	if err != nil {
 		return nil, err
 	}

@@ -9,8 +9,9 @@ import DataTableViewOptions from '@/components/data-table/view-options.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-import { scoreTypes } from '../data/data'
 import type { StockRecommendation } from '../data/schema'
+
+import { scoreTypes } from '../data/data'
 
 interface DataTableToolbarProps {
     table: Table<StockRecommendation>
@@ -18,17 +19,23 @@ interface DataTableToolbarProps {
 
 const props = defineProps<DataTableToolbarProps>()
 
-const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
+const search = defineModel<string>('search', { default: '' })
+
+const isFiltered = computed(() => search.value.length > 0 || props.table.getState().columnFilters.length > 0)
+
+function resetFilters() {
+    search.value = ''
+    props.table.resetColumnFilters()
+}
 </script>
 
 <template>
     <div class="flex items-center justify-between">
         <div class="flex items-center flex-1 space-x-2">
             <Input
-                placeholder="Filter by ticker..."
-                :model-value="(table.getColumn('ticker')?.getFilterValue() as string) ?? ''"
+                v-model="search"
+                placeholder="Search by ticker or company..."
                 class="h-8 w-[150px] lg:w-[250px]"
-                @input="table.getColumn('ticker')?.setFilterValue($event.target.value)"
             />
             <DataTableFacetedFilter
                 v-if="table.getColumn('score')"
@@ -41,7 +48,7 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
                 v-if="isFiltered"
                 variant="ghost"
                 class="h-8 px-2 lg:px-3"
-                @click="table.resetColumnFilters()"
+                @click="resetFilters()"
             >
                 Reset
                 <X class="size-4 ml-2" />

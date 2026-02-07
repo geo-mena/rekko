@@ -7,13 +7,25 @@ import type { ApiResponse } from '@/services/types/response.type'
 
 import { useAxios } from '@/composables/use-axios'
 
-export function useGetRecommendationsQuery(limit: Ref<number>) {
+export interface RecommendationFilter {
+    search?: string
+    limit?: number
+}
+
+export function useGetRecommendationsQuery(filter: Ref<RecommendationFilter>) {
     const { axiosInstance } = useAxios()
 
     return useQuery<StockRecommendation[], AxiosError>({
-        queryKey: ['recommendations', limit],
+        queryKey: ['recommendations', filter],
         queryFn: async () => {
-            const response = await axiosInstance.get<ApiResponse<StockRecommendation[]>>(`/recommendations?limit=${limit.value}`)
+            const params = new URLSearchParams()
+            const f = filter.value
+            if (f.limit)
+                params.append('limit', String(f.limit))
+            if (f.search)
+                params.append('search', f.search)
+
+            const response = await axiosInstance.get<ApiResponse<StockRecommendation[]>>(`/recommendations?${params.toString()}`)
             return response.data.data ?? []
         },
     })

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RecommendationFilter } from '@/services/api/recommendations.api'
+
 import { useGetDashboardStatsQuery } from '@/services/api/dashboard.api'
 import { useGetRecommendationsQuery, useGetTopRecommendationQuery } from '@/services/api/recommendations.api'
 
@@ -8,8 +10,8 @@ import TopRecommendations from './top-recommendations.vue'
 const { data: stats, isLoading: statsLoading } = useGetDashboardStatsQuery()
 const { data: topPick, isLoading: topPickLoading } = useGetTopRecommendationQuery()
 
-const recommendationsLimit = ref(5)
-const { data: recommendations, isLoading: recsLoading } = useGetRecommendationsQuery(recommendationsLimit)
+const recommendationsFilter = ref<RecommendationFilter>({ limit: 5 })
+const { data: recommendations, isLoading: recsLoading } = useGetRecommendationsQuery(recommendationsFilter)
 </script>
 
 <template>

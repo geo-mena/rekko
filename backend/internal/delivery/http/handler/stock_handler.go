@@ -111,12 +111,14 @@ func (h *StockHandler) SyncStocks(c *gin.Context) {
 }
 
 func (h *StockHandler) GetRecommendations(c *gin.Context) {
-	limit := 10
-	if l, err := strconv.Atoi(c.DefaultQuery("limit", "10")); err == nil {
+	limit := 50
+	if l, err := strconv.Atoi(c.DefaultQuery("limit", "50")); err == nil {
 		limit = l
 	}
 
-	recommendations, err := h.recommendationUsecase.GetTopRecommendations(c.Request.Context(), limit)
+	search := c.Query("search")
+
+	recommendations, err := h.recommendationUsecase.GetTopRecommendations(c.Request.Context(), limit, search)
 	if err != nil {
 		response.InternalServerError(c.Writer, err.Error())
 		return
