@@ -73,6 +73,15 @@ function formatPrice(value: number): string {
                     {{ recommendation.stock.brokerage }}
                 </p>
             </div>
+
+            <div class="space-y-1">
+                <p class="text-sm text-muted-foreground">
+                    Analysts
+                </p>
+                <p class="text-sm font-medium">
+                    {{ recommendation.analystCount }} covering
+                </p>
+            </div>
         </div>
 
         <div v-if="recommendation.reasons.length" class="space-y-2 py-2">

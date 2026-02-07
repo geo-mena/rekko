@@ -55,6 +55,15 @@ export const columns: ColumnDef<StockRecommendation>[] = [
         enableSorting: true,
     },
     {
+        accessorKey: 'analystCount',
+        header: ({ column }) => h(DataTableColumnHeader<StockRecommendation>, { column, title: 'Analysts' }),
+        cell: ({ row }) => {
+            const count = row.getValue('analystCount') as number
+            return h('div', { class: 'text-sm font-medium' }, `${count}`)
+        },
+        enableSorting: true,
+    },
+    {
         id: 'reasons',
         header: ({ column }) => h(DataTableColumnHeader<StockRecommendation>, { column, title: 'Reasons' }),
         cell: ({ row }) => {

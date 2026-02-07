@@ -13,6 +13,13 @@ const (
 	TopRecommendationRetrieved = "Top recommendation retrieved successfully"
 	NoRecommendationsAvailable = "no recommendations available"
 
+	ReasonRatingUpgraded  = "Rating upgraded from %s to %s"
+	ReasonStrongRating    = "Strong rating: %s"
+	ReasonTargetIncreased = "Target price increased %.1f%% to $%.2f"
+	ReasonActionBy        = "%s by %s"
+	ReasonAnalystsBullish = "%d/%d analysts bullish"
+	ReasonRecentSignals   = "%d analyst signals in the last 7 days"
+
 	DashboardStatsRetrieved = "Dashboard stats retrieved successfully"
 
 	ServiceRunning = "Service is running"

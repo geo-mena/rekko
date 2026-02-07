@@ -7,6 +7,7 @@ export const stockRecommendationSchema = z.object({
     score: z.number(),
     reasons: z.array(z.string()),
     upsidePotential: z.number(),
+    analystCount: z.number(),
 })
 export type StockRecommendation = z.infer<typeof stockRecommendationSchema>
 

@@ -44,6 +44,7 @@ type StockRecommendation struct {
 	Score           float64  `json:"score"`
 	Reasons         []string `json:"reasons"`
 	UpsidePotential float64  `json:"upsidePotential"`
+	AnalystCount    int      `json:"analystCount"`
 }
 
 type PaginatedStocks struct {
