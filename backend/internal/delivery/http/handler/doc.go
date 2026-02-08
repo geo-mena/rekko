@@ -5,8 +5,6 @@ import (
 	"github.com/geomena/stock-recommendation-system/backend/internal/domain"
 )
 
-// Type aliases so swag resolves short names instead of full module paths.
-
 type APIResponse = response.Response
 type PaginationMeta = response.Meta
 type Pagination = response.Pagination
