@@ -18,9 +18,12 @@ FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /root/
+WORKDIR /app
 
 COPY --from=builder /server .
+COPY --from=builder /app/migrations ./migrations
+
+ENV MIGRATIONS_PATH=/app/migrations
 
 EXPOSE 8080
 

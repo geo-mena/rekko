@@ -1,11 +1,14 @@
 package cockroachdb
 
 import (
-	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/cockroachdb"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
@@ -23,10 +26,7 @@ func NewDB(databaseURL string) (*DB, error) {
 	conn.SetMaxIdleConns(5)
 	conn.SetConnMaxLifetime(5 * time.Minute)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if err := conn.PingContext(ctx); err != nil {
+	if err := conn.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
@@ -41,34 +41,41 @@ func (db *DB) Conn() *sql.DB {
 	return db.conn
 }
 
-func (db *DB) RunMigrations(ctx context.Context) error {
-	migrations := []string{
-		`CREATE DATABASE IF NOT EXISTS stockdb`,
-		`SET DATABASE = stockdb`,
-		`CREATE TABLE IF NOT EXISTS stocks (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			ticker VARCHAR(10) NOT NULL,
-			company VARCHAR(255) NOT NULL,
-			brokerage VARCHAR(255) NOT NULL,
-			action VARCHAR(50) NOT NULL,
-			rating_from VARCHAR(50),
-			rating_to VARCHAR(50),
-			target_from DECIMAL(10, 2),
-			target_to DECIMAL(10, 2),
-			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-			updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-			UNIQUE (ticker, brokerage, action, rating_from, rating_to, target_from, target_to)
-		)`,
-		`CREATE INDEX IF NOT EXISTS idx_stocks_ticker ON stocks(ticker)`,
-		`CREATE INDEX IF NOT EXISTS idx_stocks_company ON stocks(company)`,
-		`CREATE INDEX IF NOT EXISTS idx_stocks_action ON stocks(action)`,
-		`CREATE INDEX IF NOT EXISTS idx_stocks_created_at ON stocks(created_at DESC)`,
+func (db *DB) RunMigrations(migrationsPath string) error {
+	if err := db.ensureDatabase(); err != nil {
+		return fmt.Errorf("failed to ensure database exists: %w", err)
 	}
 
-	for _, migration := range migrations {
-		if _, err := db.conn.ExecContext(ctx, migration); err != nil {
-			return fmt.Errorf("migration failed: %w", err)
-		}
+	driver, err := cockroachdb.WithInstance(db.conn, &cockroachdb.Config{})
+	if err != nil {
+		return fmt.Errorf("failed to create migration driver: %w", err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		fmt.Sprintf("file://%s", migrationsPath),
+		"cockroachdb",
+		driver,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create migrate instance: %w", err)
+	}
+
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	return nil
+}
+
+func (db *DB) ensureDatabase() error {
+	_, err := db.conn.Exec(`CREATE DATABASE IF NOT EXISTS stockdb`)
+	if err != nil {
+		return fmt.Errorf("failed to create database: %w", err)
+	}
+
+	_, err = db.conn.Exec(`SET DATABASE = stockdb`)
+	if err != nil {
+		return fmt.Errorf("failed to set database: %w", err)
 	}
 
 	return nil

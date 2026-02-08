@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/geomena/stock-recommendation-system/backend/internal/config"
 	httpDelivery "github.com/geomena/stock-recommendation-system/backend/internal/delivery/http"
@@ -34,10 +32,7 @@ func main() {
 	}
 	defer db.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := db.RunMigrations(ctx); err != nil {
+	if err := db.RunMigrations(cfg.MigrationsPath); err != nil {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 	log.Println("Database migrations completed")

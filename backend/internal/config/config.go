@@ -9,6 +9,7 @@ type Config struct {
 	KarenaiAPIURL   string
 	KarenaiAPIToken string
 	ServerPort      string
+	MigrationsPath  string
 }
 
 func Load() *Config {
@@ -17,6 +18,7 @@ func Load() *Config {
 		KarenaiAPIURL:   getEnv("KARENAI_API_URL", "https://api.karenai.click"),
 		KarenaiAPIToken: getEnv("KARENAI_AUTH_TOKEN", ""),
 		ServerPort:      getEnv("SERVER_PORT", "8080"),
+		MigrationsPath:  getEnv("MIGRATIONS_PATH", "./migrations"),
 	}
 }
 
