@@ -1,3 +1,5 @@
+<div align="center">
+
 # Rekko
 
 ![Go Version](https://img.shields.io/badge/Go-1.24-00ADD8?style=flat&logo=go)
@@ -9,7 +11,7 @@
 
 Stock recommendation engine powered by analyst ratings and price targets.
 
----
+</div>
 
 ## Table of Contents
 
@@ -22,10 +24,12 @@ Stock recommendation engine powered by analyst ratings and price targets.
   - [Backend Setup](#backend-setup)
   - [Frontend Setup](#frontend-setup)
   - [Database Only](#database-only)
+- [API Documentation](#api-documentation)
 - [API Endpoints](#api-endpoints)
   - [Health Check](#health-check)
   - [Stock Endpoints](#stock-endpoints)
   - [Recommendation Endpoints](#recommendation-endpoints)
+  - [Dashboard Endpoint](#dashboard-endpoint)
   - [Sync Endpoint](#sync-endpoint)
 - [Project Structure](#project-structure)
 - [Recommendation Algorithm](#recommendation-algorithm)
@@ -36,8 +40,6 @@ Stock recommendation engine powered by analyst ratings and price targets.
 - [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
 
----
-
 ## Project Overview
 
 Rekko aggregates analyst recommendations from external sources and applies a weighted scoring algorithm to identify the most promising investment opportunities. The system provides:
@@ -47,8 +49,6 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 - A responsive web interface for browsing, searching, and filtering stock recommendations
 - RESTful API for programmatic access to stock data and recommendations
 
----
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -56,11 +56,10 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 | **Backend** | Go 1.24 with Gin framework |
 | **Frontend** | Vue 3 + TypeScript + Pinia + Tailwind CSS 4 |
 | **Database** | CockroachDB v23.2 |
-| **API Style** | RESTful |
+| **UI Components** | shadcn-vue, Radix Vue, TanStack Table, TanStack Vue Query |
+| **API Style** | RESTful with OpenAPI/Swagger documentation |
 | **Build Tools** | Docker, Docker Compose |
 | **Package Manager** | pnpm (frontend) |
-
----
 
 ## Features
 
@@ -73,10 +72,10 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
   - Target price increases
   - Brokerage consensus and action types
   - Analyst credibility signals
+- **Dashboard Analytics**: Aggregated statistics including total stocks, action distribution, top brokerages, and recent daily activity
 - **Pagination**: Efficient handling of large datasets with server-side pagination
-- **Responsive UI**: Mobile-friendly interface built with Tailwind CSS
-
----
+- **Responsive UI**: Mobile-friendly interface built with Tailwind CSS and shadcn-vue, featuring dark/light theme support and a collapsible sidebar navigation
+- **Interactive API Documentation**: Auto-generated Swagger UI for exploring and testing all endpoints directly from the browser
 
 ## Prerequisites
 
@@ -141,6 +140,7 @@ You should see all three services in "running" state.
 |---------|-----|
 | Frontend | http://localhost:3000 |
 | Backend API | http://localhost:8080 |
+| Swagger UI | http://localhost:8080/swagger/ |
 | CockroachDB UI | http://localhost:8081 |
 
 ### 6. Populate the database
@@ -159,8 +159,11 @@ curl -X POST http://localhost:8080/api/v1/sync
 Expected response:
 ```json
 {
-  "message": "sync completed",
-  "count": 150
+  "status": true,
+  "message": "Sync completed successfully",
+  "data": {
+    "count": 150
+  }
 }
 ```
 
@@ -174,8 +177,6 @@ To also remove the database volume:
 ```bash
 docker-compose down -v
 ```
-
----
 
 ## Local Development
 
@@ -224,9 +225,9 @@ docker-compose down -v
    pnpm install
    ```
 
-3. **Set the API URL** (create `.env` file if needed):
+3. **Set the API configuration** by copying the example environment file:
    ```bash
-   echo "VITE_API_BASE_URL=http://localhost:8080" > .env
+   cp .env.example .env
    ```
 
 4. **Run the development server**:
@@ -248,7 +249,25 @@ Access the database:
 - **SQL CLI**: `docker exec -it rekko-cockroachdb cockroach sql --insecure`
 - **Admin UI**: http://localhost:8081
 
----
+## API Documentation
+
+The backend ships with auto-generated **Swagger/OpenAPI** documentation, built using [swag](https://github.com/swaggo/swag) annotations embedded in every handler. The Swagger specification is regenerated at build time via `swag init` during the Docker build, ensuring that the documentation always reflects the current state of the codebase.
+
+Once the backend is running, the interactive Swagger UI is available at:
+
+```
+http://localhost:8080/swagger/
+```
+
+The raw OpenAPI specification is served as JSON at `/swagger/doc.json`, making it straightforward to import into tools such as Postman, Insomnia, or any OpenAPI-compatible client.
+
+For local development without Docker, you can regenerate the documentation manually:
+
+```bash
+cd backend
+go install github.com/swaggo/swag/cmd/swag@v1.16.6
+swag init -g cmd/server/main.go -o docs --parseInternal
+```
 
 ## API Endpoints
 
@@ -258,7 +277,7 @@ Base URL: `http://localhost:8080/api/v1`
 
 **GET** `/health`
 
-Check if the API is running.
+Returns the current health status of the service. When the `Accept` header includes `text/html`, the endpoint renders an HTML status page instead of JSON.
 
 ```bash
 curl http://localhost:8080/api/v1/health
@@ -267,7 +286,8 @@ curl http://localhost:8080/api/v1/health
 Response:
 ```json
 {
-  "status": "ok"
+  "status": true,
+  "message": "Service is running"
 }
 ```
 
@@ -282,6 +302,7 @@ Response:
 | `page` | int | 1 | Page number |
 | `limit` | int | 20 | Items per page (max: 100) |
 | `search` | string | - | Search by ticker or company name |
+| `ticker` | string | - | Filter by exact ticker symbol |
 | `action` | string | - | Filter by action type |
 | `sortBy` | string | created_at | Sort field: `ticker`, `company`, `action`, `targetTo`, `createdAt` |
 | `sortOrder` | string | desc | Sort order: `asc`, `desc` |
@@ -303,6 +324,8 @@ curl "http://localhost:8080/api/v1/stocks?page=2&limit=50"
 Response:
 ```json
 {
+  "status": true,
+  "message": "Stocks retrieved successfully",
   "data": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -318,12 +341,15 @@ Response:
       "updatedAt": "2024-01-15T10:30:00Z"
     }
   ],
-  "page": 1,
-  "limit": 20,
-  "totalCount": 150,
-  "totalPages": 8,
-  "hasNext": true,
-  "hasPrev": false
+  "meta": {
+    "pagination": {
+      "current_page": 1,
+      "per_page": 20,
+      "total_items": 150,
+      "total_pages": 8,
+      "has_next": true
+    }
+  }
 }
 ```
 
@@ -346,6 +372,8 @@ curl http://localhost:8080/api/v1/stocks/ticker/AAPL
 Response:
 ```json
 {
+  "status": true,
+  "message": "Stocks retrieved successfully",
   "data": [
     {
       "id": "...",
@@ -378,6 +406,8 @@ curl http://localhost:8080/api/v1/stocks/actions
 Response:
 ```json
 {
+  "status": true,
+  "message": "Actions retrieved successfully",
   "data": [
     "upgraded",
     "downgraded",
@@ -398,19 +428,25 @@ Response:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `limit` | int | 10 | Number of recommendations (max: 50) |
+| `limit` | int | 50 | Maximum number of recommendations to return |
+| `search` | string | - | Filter by ticker or company name |
 
 ```bash
-# Get top 10 recommendations
+# Get top recommendations
 curl http://localhost:8080/api/v1/recommendations
 
 # Get top 5 recommendations
 curl "http://localhost:8080/api/v1/recommendations?limit=5"
+
+# Search within recommendations
+curl "http://localhost:8080/api/v1/recommendations?search=NVDA"
 ```
 
 Response:
 ```json
 {
+  "status": true,
+  "message": "Recommendations retrieved successfully",
   "data": [
     {
       "stock": {
@@ -430,7 +466,9 @@ Response:
         "Target price increased 33.3% to $600.00",
         "upgraded by Bank of America"
       ],
-      "upsidePotential": 33.33
+      "upsidePotential": 33.33,
+      "analystCount": 4,
+      "marketData": null
     }
   ]
 }
@@ -447,15 +485,57 @@ curl http://localhost:8080/api/v1/recommendations/top
 Response:
 ```json
 {
-  "stock": {
-    "id": "...",
-    "ticker": "NVDA",
-    "company": "NVIDIA Corporation",
-    ...
-  },
-  "score": 85.5,
-  "reasons": [...],
-  "upsidePotential": 33.33
+  "status": true,
+  "message": "Top recommendation retrieved successfully",
+  "data": {
+    "stock": {
+      "id": "...",
+      "ticker": "NVDA",
+      "company": "NVIDIA Corporation",
+      ...
+    },
+    "score": 85.5,
+    "reasons": [...],
+    "upsidePotential": 33.33,
+    "analystCount": 4,
+    "marketData": null
+  }
+}
+```
+
+### Dashboard Endpoint
+
+#### Get Dashboard Statistics
+
+**GET** `/dashboard/stats`
+
+Returns aggregated statistics including total stocks, action distribution across the dataset, the top brokerages by volume, and daily activity over the last 30 days.
+
+```bash
+curl http://localhost:8080/api/v1/dashboard/stats
+```
+
+Response:
+```json
+{
+  "status": true,
+  "message": "Dashboard stats retrieved successfully",
+  "data": {
+    "totalStocks": 150,
+    "actionDistribution": [
+      { "action": "upgraded", "count": 45 },
+      { "action": "maintained", "count": 38 },
+      { "action": "initiated", "count": 27 }
+    ],
+    "brokerageDistribution": [
+      { "brokerage": "Morgan Stanley", "count": 22 },
+      { "brokerage": "Goldman Sachs", "count": 18 }
+    ],
+    "recentActivity": [
+      { "date": "2024-01-15", "count": 12 },
+      { "date": "2024-01-14", "count": 8 }
+    ]
+  }
 }
 ```
 
@@ -474,8 +554,11 @@ curl -X POST http://localhost:8080/api/v1/sync
 Response:
 ```json
 {
-  "message": "sync completed",
-  "count": 150
+  "status": true,
+  "message": "Sync completed successfully",
+  "data": {
+    "count": 150
+  }
 }
 ```
 
@@ -484,86 +567,6 @@ Response:
 2. Fetches all stock recommendations (handles pagination automatically)
 3. Upserts records into the database (updates existing, inserts new)
 4. Returns the count of processed records
-
----
-
-## Project Structure
-
-```
-rekko/
-├── backend/
-│   ├── cmd/
-│   │   └── server/
-│   │       └── main.go              # Application entry point
-│   ├── internal/
-│   │   ├── config/
-│   │   │   └── config.go            # Environment configuration
-│   │   ├── domain/
-│   │   │   ├── stock.go             # Stock entity and DTOs
-│   │   │   └── errors.go            # Domain errors
-│   │   ├── repository/
-│   │   │   ├── interfaces.go        # Repository interfaces
-│   │   │   └── cockroachdb/
-│   │   │       ├── db.go            # Database connection
-│   │   │       └── stock_repository.go  # Stock repository implementation
-│   │   ├── usecase/
-│   │   │   ├── stock_usecase.go     # Stock business logic
-│   │   │   └── recommendation_usecase.go  # Recommendation algorithm
-│   │   ├── delivery/
-│   │   │   └── http/
-│   │   │       ├── router.go        # HTTP router setup
-│   │   │       ├── handler/
-│   │   │       │   ├── stock_handler.go   # Stock HTTP handlers
-│   │   │       │   └── health_handler.go  # Health check handler
-│   │   │       └── middleware/
-│   │   │           ├── cors.go      # CORS middleware
-│   │   │           └── logging.go   # Request logging
-│   │   └── external/
-│   │       └── karenai/
-│   │           └── client.go        # External API client
-│   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile
-├── frontend/
-│   ├── src/
-│   │   ├── main.ts                  # Vue app entry
-│   │   ├── App.vue                  # Root component
-│   │   ├── components/
-│   │   │   ├── common/
-│   │   │   │   ├── AppHeader.vue    # Navigation header
-│   │   │   │   ├── LoadingSpinner.vue
-│   │   │   │   ├── ErrorAlert.vue
-│   │   │   │   └── Pagination.vue
-│   │   │   ├── stock/
-│   │   │   │   ├── StockSearch.vue
-│   │   │   │   ├── StockTable.vue
-│   │   │   │   └── StockFilters.vue
-│   │   │   └── recommendation/
-│   │   │       └── RecommendationCard.vue
-│   │   ├── views/
-│   │   │   ├── HomeView.vue         # Stock listing page
-│   │   │   ├── StockDetailView.vue  # Individual stock page
-│   │   │   └── RecommendationView.vue  # Recommendations page
-│   │   ├── stores/
-│   │   │   └── stockStore.ts        # Pinia store
-│   │   ├── services/
-│   │   │   ├── api.ts               # Axios instance
-│   │   │   └── stockService.ts      # API service methods
-│   │   ├── composables/
-│   │   │   └── useDebounce.ts       # Debounce hook
-│   │   ├── types/
-│   │   │   └── stock.ts             # TypeScript interfaces
-│   │   └── router/
-│   │       └── index.ts             # Vue Router config
-│   ├── package.json
-│   ├── pnpm-lock.yaml
-│   └── Dockerfile
-├── docker-compose.yml
-├── .env.example
-└── README.md
-```
-
----
 
 ## Recommendation Algorithm
 
@@ -671,19 +674,27 @@ Real-time market data is sourced from the **Finnhub API**, which provides live q
 
 The final composite score is the weighted sum of all applicable factors, divided by 10 to produce the 0–10 scale. Recommendations are ranked by descending score.
 
----
-
 ## Environment Variables
+
+### Backend
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `DATABASE_URL` | Yes | - | PostgreSQL/CockroachDB connection string |
+| `DATABASE_URL` | No | `postgresql://root@localhost:26257/stockdb?sslmode=disable` | PostgreSQL/CockroachDB connection string |
 | `KARENAI_API_URL` | No | `https://api.karenai.click` | External API base URL |
 | `KARENAI_AUTH_TOKEN` | Yes | - | Bearer token for external API |
 | `FINNHUB_API_KEY` | No | - | Finnhub API key for real-time market data enrichment |
 | `SERVER_PORT` | No | `8080` | Backend server port |
 | `GIN_MODE` | No | `debug` | Gin framework mode — `debug` or `release` |
-| `VITE_API_BASE_URL` | No | `http://localhost:8080` | Frontend API URL |
+| `MIGRATIONS_PATH` | No | `./migrations` | Path to the SQL migration files directory |
+
+### Frontend
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `VITE_SERVER_API_URL` | Yes | - | Base URL for the backend API, e.g. `http://localhost:3000` |
+| `VITE_SERVER_API_PREFIX` | Yes | - | API path prefix appended to the base URL, e.g. `/api` |
+| `VITE_SERVER_API_TIMEOUT` | No | `5000` | HTTP request timeout in milliseconds |
 
 ### Example `.env` file
 
@@ -701,12 +712,15 @@ FINNHUB_API_KEY=your_finnhub_api_key_here
 # Server
 SERVER_PORT=8080
 GIN_MODE=debug
-
-# Frontend
-VITE_API_BASE_URL=http://localhost:8080
 ```
 
----
+The frontend uses its own `.env` file inside the `frontend/` directory. Refer to `frontend/.env.example` for the template:
+
+```bash
+VITE_SERVER_API_URL=http://localhost:3000
+VITE_SERVER_API_PREFIX=/api
+VITE_SERVER_API_TIMEOUT=5000
+```
 
 ## Testing
 
@@ -742,7 +756,7 @@ pnpm test
 
 ### Manual API Testing
 
-Test the API endpoints using curl:
+Test the API endpoints using curl, or use the interactive [Swagger UI](http://localhost:8080/swagger/) for a browser-based experience:
 
 ```bash
 # Health check
@@ -759,9 +773,10 @@ curl http://localhost:8080/api/v1/recommendations
 
 # Get best recommendation
 curl http://localhost:8080/api/v1/recommendations/top
-```
 
----
+# Get dashboard statistics
+curl http://localhost:8080/api/v1/dashboard/stats
+```
 
 ## Troubleshooting
 
@@ -819,7 +834,7 @@ curl http://localhost:8080/api/v1/recommendations/top
   ```bash
   curl http://localhost:8080/api/v1/health
   ```
-- Check `VITE_API_BASE_URL` is set correctly
+- Check `VITE_SERVER_API_URL` and `VITE_SERVER_API_PREFIX` are set correctly in `frontend/.env`
 - Ensure CORS is properly configured in the backend
 - If using Docker, ensure all services are on the same network
 
@@ -871,8 +886,6 @@ If you encounter issues not covered here:
 3. Ensure all prerequisites are installed with the correct versions
 4. Try rebuilding containers: `docker-compose build --no-cache`
 
----
-
 ## License
 
-MIT
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
