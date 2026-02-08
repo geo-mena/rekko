@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.HealthHandler, dashboardHandler *handler.DashboardHandler) *gin.Engine {
+func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.HealthHandler, dashboardHandler *handler.DashboardHandler, staticDir string) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.Recovery())
@@ -30,6 +30,10 @@ func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.Health
 
 		api.GET("/recommendations", stockHandler.GetRecommendations)
 		api.GET("/recommendations/top", stockHandler.GetTopRecommendation)
+	}
+
+	if staticDir != "" {
+		registerStaticRoutes(router, staticDir)
 	}
 
 	return router

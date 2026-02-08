@@ -11,8 +11,8 @@ import (
 	"github.com/geomena/stock-recommendation-system/backend/internal/repository/cockroachdb"
 )
 
-func initDatabase(databaseURL, migrationsPath string) *cockroachdb.DB {
-	db, err := cockroachdb.NewDB(databaseURL)
+func initDatabase(databaseURL, migrationsPath, dbDriver string) *cockroachdb.DB {
+	db, err := cockroachdb.NewDB(databaseURL, dbDriver)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}

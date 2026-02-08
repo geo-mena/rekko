@@ -22,7 +22,7 @@ import (
 func main() {
 	cfg := config.Load()
 
-	db := initDatabase(cfg.DatabaseURL, cfg.MigrationsPath)
+	db := initDatabase(cfg.DatabaseURL, cfg.MigrationsPath, cfg.DBDriver)
 	defer db.Close()
 
 	stockRepo := cockroachdb.NewStockRepository(db)
@@ -41,7 +41,7 @@ func main() {
 	healthHandler := handler.NewHealthHandler()
 	dashboardHandler := handler.NewDashboardHandler(dashboardUsecase)
 
-	router := httpDelivery.NewRouter(stockHandler, healthHandler, dashboardHandler)
+	router := httpDelivery.NewRouter(stockHandler, healthHandler, dashboardHandler, cfg.StaticDir)
 
 	startServer(router, cfg.ServerPort)
 	waitForShutdown()

@@ -7,16 +7,19 @@ import (
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/cockroachdb"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
 type DB struct {
-	conn *sql.DB
+	conn     *sql.DB
+	dbDriver string
 }
 
-func NewDB(databaseURL string) (*DB, error) {
+func NewDB(databaseURL, dbDriver string) (*DB, error) {
 	conn, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
@@ -30,7 +33,7 @@ func NewDB(databaseURL string) (*DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	return &DB{conn: conn}, nil
+	return &DB{conn: conn, dbDriver: dbDriver}, nil
 }
 
 func (db *DB) Close() error {
@@ -42,18 +45,20 @@ func (db *DB) Conn() *sql.DB {
 }
 
 func (db *DB) RunMigrations(migrationsPath string) error {
-	if err := db.ensureDatabase(); err != nil {
-		return fmt.Errorf("failed to ensure database exists: %w", err)
+	if db.dbDriver != "postgres" {
+		if err := db.ensureDatabase(); err != nil {
+			return fmt.Errorf("failed to ensure database exists: %w", err)
+		}
 	}
 
-	driver, err := cockroachdb.WithInstance(db.conn, &cockroachdb.Config{})
+	driver, driverName, err := db.createMigrationDriver()
 	if err != nil {
 		return fmt.Errorf("failed to create migration driver: %w", err)
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
 		fmt.Sprintf("file://%s", migrationsPath),
-		"cockroachdb",
+		driverName,
 		driver,
 	)
 	if err != nil {
@@ -65,6 +70,16 @@ func (db *DB) RunMigrations(migrationsPath string) error {
 	}
 
 	return nil
+}
+
+func (db *DB) createMigrationDriver() (database.Driver, string, error) {
+	if db.dbDriver == "postgres" {
+		driver, err := postgres.WithInstance(db.conn, &postgres.Config{})
+		return driver, "postgres", err
+	}
+
+	driver, err := cockroachdb.WithInstance(db.conn, &cockroachdb.Config{})
+	return driver, "cockroachdb", err
 }
 
 func (db *DB) ensureDatabase() error {
