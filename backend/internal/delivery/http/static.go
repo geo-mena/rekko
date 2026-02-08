@@ -4,20 +4,31 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func registerStaticRoutes(router *gin.Engine, staticDir string) {
-	router.Static("/assets", filepath.Join(staticDir, "assets"))
-	router.StaticFile("/favicon.ico", filepath.Join(staticDir, "favicon.ico"))
+	fs := http.FileServer(http.Dir(staticDir))
 
 	router.NoRoute(func(c *gin.Context) {
-		indexPath := filepath.Join(staticDir, "index.html")
-		if _, err := os.Stat(indexPath); err == nil {
-			c.File(indexPath)
+		path := c.Request.URL.Path
+
+		// Skip API and Swagger routes
+		if strings.HasPrefix(path, "/api/") || strings.HasPrefix(path, "/swagger/") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return
 		}
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+
+		// Try to serve the static file
+		filePath := filepath.Join(staticDir, path)
+		if _, err := os.Stat(filePath); err == nil {
+			fs.ServeHTTP(c.Writer, c.Request)
+			return
+		}
+
+		// SPA fallback: serve index.html
+		c.File(filepath.Join(staticDir, "index.html"))
 	})
 }
