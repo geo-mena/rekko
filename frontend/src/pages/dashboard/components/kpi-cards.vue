@@ -32,13 +32,18 @@ const avgUpside = computed(() => {
                 </div>
             </UiCardHeader>
             <UiCardContent>
-                <div class="text-2xl font-bold">
-                    <UiSkeleton v-if="loading" class="h-8 w-20" />
-                    <span v-else>{{ stats?.totalStocks?.toLocaleString() ?? '—' }}</span>
-                </div>
-                <p class="text-xs text-muted-foreground">
-                    Tracked analyst ratings
-                </p>
+                <template v-if="loading">
+                    <UiSkeleton class="h-8 w-16 mb-1" />
+                    <UiSkeleton class="h-3 w-28" />
+                </template>
+                <template v-else>
+                    <div class="text-2xl font-bold">
+                        {{ stats?.totalStocks?.toLocaleString() ?? '—' }}
+                    </div>
+                    <p class="text-xs text-muted-foreground">
+                        Tracked analyst ratings
+                    </p>
+                </template>
             </UiCardContent>
         </UiCard>
 
@@ -52,16 +57,21 @@ const avgUpside = computed(() => {
                 </div>
             </UiCardHeader>
             <UiCardContent>
-                <div class="text-2xl font-bold">
-                    <UiSkeleton v-if="loading" class="h-8 w-20" />
-                    <span v-else>{{ topPick?.stock.ticker ?? '—' }}</span>
-                </div>
-                <p v-if="topPick" class="text-xs text-emerald-600 dark:text-emerald-400">
-                    +{{ topPick.upsidePotential.toFixed(1) }}% upside potential
-                </p>
-                <p v-else class="text-xs text-muted-foreground">
-                    No data available
-                </p>
+                <template v-if="loading">
+                    <UiSkeleton class="h-8 w-20 mb-1" />
+                    <UiSkeleton class="h-3 w-32" />
+                </template>
+                <template v-else>
+                    <div class="text-2xl font-bold">
+                        {{ topPick?.stock.ticker ?? '—' }}
+                    </div>
+                    <p v-if="topPick" class="text-xs text-emerald-600 dark:text-emerald-400">
+                        +{{ topPick.upsidePotential.toFixed(1) }}% upside potential
+                    </p>
+                    <p v-else class="text-xs text-muted-foreground">
+                        No data available
+                    </p>
+                </template>
             </UiCardContent>
         </UiCard>
 
@@ -75,13 +85,18 @@ const avgUpside = computed(() => {
                 </div>
             </UiCardHeader>
             <UiCardContent>
-                <div class="text-2xl font-bold">
-                    <UiSkeleton v-if="loading" class="h-8 w-20" />
-                    <span v-else class="text-emerald-600 dark:text-emerald-400">{{ avgUpside }}%</span>
-                </div>
-                <p class="text-xs text-muted-foreground">
-                    Across top recommendations
-                </p>
+                <template v-if="loading">
+                    <UiSkeleton class="h-8 w-14 mb-1" />
+                    <UiSkeleton class="h-3 w-36" />
+                </template>
+                <template v-else>
+                    <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        {{ avgUpside }}%
+                    </div>
+                    <p class="text-xs text-muted-foreground">
+                        Across top recommendations
+                    </p>
+                </template>
             </UiCardContent>
         </UiCard>
 
@@ -95,13 +110,18 @@ const avgUpside = computed(() => {
                 </div>
             </UiCardHeader>
             <UiCardContent>
-                <div class="text-2xl font-bold">
-                    <UiSkeleton v-if="loading" class="h-8 w-20" />
-                    <span v-else>{{ stats?.brokerageDistribution?.length ?? '—' }}</span>
-                </div>
-                <p class="text-xs text-muted-foreground">
-                    Active analyst firms
-                </p>
+                <template v-if="loading">
+                    <UiSkeleton class="h-8 w-10 mb-1" />
+                    <UiSkeleton class="h-3 w-24" />
+                </template>
+                <template v-else>
+                    <div class="text-2xl font-bold">
+                        {{ stats?.brokerageDistribution?.length ?? '—' }}
+                    </div>
+                    <p class="text-xs text-muted-foreground">
+                        Active analyst firms
+                    </p>
+                </template>
             </UiCardContent>
         </UiCard>
     </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { VisDonut, VisSingleContainer } from '@unovis/vue'
+import { ArrowRight } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 import type { ChartConfig } from '@/components/ui/chart'
@@ -53,13 +54,29 @@ const total = computed(() => props.data.reduce((sum, item) => sum + item.count, 
 
 <template>
     <UiCard class="h-full">
-        <UiCardHeader>
-            <UiCardTitle>Action Distribution</UiCardTitle>
-            <UiCardDescription>Distribution of recommendation actions</UiCardDescription>
+        <UiCardHeader class="flex flex-row items-center justify-between">
+            <div>
+                <UiCardTitle>Action Distribution</UiCardTitle>
+                <UiCardDescription>Distribution of recommendation actions</UiCardDescription>
+            </div>
+            <RouterLink to="/stocks" class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                View all
+                <ArrowRight class="size-4" />
+            </RouterLink>
         </UiCardHeader>
         <UiCardContent>
-            <div v-if="loading" class="h-[300px] flex items-center justify-center">
-                <UiSkeleton class="h-full w-full" />
+            <div v-if="loading" class="h-[300px] flex flex-col items-center justify-center">
+                <div class="relative flex items-center justify-center">
+                    <UiSkeleton class="size-40 rounded-full" />
+                    <div class="absolute size-24 rounded-full bg-card" />
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-6">
+                    <div v-for="i in 4" :key="i" class="flex items-center gap-1.5">
+                        <UiSkeleton class="size-2 rounded-sm" />
+                        <UiSkeleton class="h-3 w-14" />
+                        <UiSkeleton class="h-3 w-6" />
+                    </div>
+                </div>
             </div>
             <div v-else-if="data.length === 0" class="h-[300px] flex items-center justify-center text-muted-foreground">
                 No action data available
@@ -71,8 +88,6 @@ const total = computed(() => props.data.reduce((sum, item) => sum + item.count, 
                         :color="colorAccessor"
                         :arc-width="50"
                         :corner-radius="4"
-                        :pad-angle="0.02"
-                        :show-background="true"
                         :central-label="String(total)"
                         central-sub-label="Total"
                     />

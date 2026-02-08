@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowRight } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 import type { StockRecommendation } from '@/pages/recommendations/data/schema'
@@ -42,13 +43,33 @@ function formatUpside(value: number): string {
 
 <template>
     <UiCard class="h-full">
-        <UiCardHeader>
-            <UiCardTitle>Top Picks by Upside</UiCardTitle>
-            <UiCardDescription>Stocks with highest upside potential</UiCardDescription>
+        <UiCardHeader class="flex flex-row items-center justify-between">
+            <div>
+                <UiCardTitle>Top Picks by Upside</UiCardTitle>
+                <UiCardDescription>Stocks with highest upside potential</UiCardDescription>
+            </div>
+            <RouterLink to="/recommendations" class="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                View all
+                <ArrowRight class="size-4" />
+            </RouterLink>
         </UiCardHeader>
         <UiCardContent>
-            <div v-if="loading" class="h-[300px] flex items-center justify-center">
-                <UiSkeleton class="h-full w-full" />
+            <div v-if="loading" class="h-[300px] flex flex-col">
+                <div class="flex flex-1 flex-col justify-center space-y-3">
+                    <div v-for="(width, i) in ['85%', '70%', '55%', '40%', '30%']" :key="i" class="flex items-center gap-3">
+                        <UiSkeleton class="h-4 w-16 shrink-0" />
+                        <div class="relative h-8 flex-1 overflow-hidden rounded bg-muted">
+                            <UiSkeleton class="absolute inset-y-0 left-0 rounded" :style="{ width }" />
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 pt-4 border-t mt-4">
+                    <div v-for="i in 5" :key="i" class="flex items-center gap-2">
+                        <UiSkeleton class="size-3 rounded-sm" />
+                        <UiSkeleton class="h-3 w-10" />
+                        <UiSkeleton class="h-3 w-12" />
+                    </div>
+                </div>
             </div>
             <div v-else-if="data.length === 0" class="h-[300px] flex items-center justify-center text-muted-foreground">
                 No recommendation data available
