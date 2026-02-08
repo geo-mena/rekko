@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCookies } from '@vueuse/integrations/useCookies'
-import { Loader, RefreshCw } from 'lucide-vue-next'
+import { Braces, Loader, RefreshCw } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { toast } from 'vue-sonner'
 
@@ -47,6 +47,10 @@ function handleSync() {
                         <Loader v-if="isSyncing" class="animate-spin" />
                         <RefreshCw v-else />
                         Sync Data
+                    </UiButton>
+                    <UiButton variant="outline" as="a" href="/swagger" target="_blank">
+                        <Braces />
+                        API
                     </UiButton>
                     <ToggleTheme />
                     <ThemePopover />
