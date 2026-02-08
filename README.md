@@ -89,8 +89,6 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 - pnpm 8+ (`npm install -g pnpm`)
 - CockroachDB (can run via Docker)
 
----
-
 ## Quick Start (Docker)
 
 The fastest way to get the application running is with Docker Compose.
