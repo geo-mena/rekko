@@ -36,7 +36,7 @@ func newTestApp() *testApp {
 	healthHandler := handler.NewHealthHandler()
 	dashboardHandler := handler.NewDashboardHandler(dashboardUsecase)
 
-	router := httpdelivery.NewRouter(stockHandler, healthHandler, dashboardHandler)
+	router := httpdelivery.NewRouter(stockHandler, healthHandler, dashboardHandler, "")
 
 	return &testApp{
 		router:   router,
