@@ -14,8 +14,17 @@ import (
 	"github.com/geomena/stock-recommendation-system/backend/internal/external/karenai"
 	"github.com/geomena/stock-recommendation-system/backend/internal/repository/cockroachdb"
 	"github.com/geomena/stock-recommendation-system/backend/internal/usecase"
+
+	_ "github.com/geomena/stock-recommendation-system/backend/docs"
 )
 
+//	@title						Rekko API
+//	@version					1.0
+//	@description				API for stock recommendations, analyst ratings, and portfolio insights.
+//	@host						localhost:8080
+//	@BasePath					/api/v1
+//	@produce					json
+//	@consumes					json
 func main() {
 	cfg := config.Load()
 

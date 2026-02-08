@@ -14,6 +14,14 @@ func NewHealthHandler() *HealthHandler {
 	return &HealthHandler{}
 }
 
+// Health godoc
+//
+//	@Summary	Health check
+//	@Description	Returns the current health status of the service
+//	@Tags			Health
+//	@Produce		json
+//	@Success		200	{object}	APIResponse	"Service is running"
+//	@Router			/health [get]
 func (h *HealthHandler) Health(c *gin.Context) {
 	response.MessageOnly(c.Writer, http.StatusOK, en.ServiceRunning)
 }

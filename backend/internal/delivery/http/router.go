@@ -13,6 +13,8 @@ func NewRouter(stockHandler *handler.StockHandler, healthHandler *handler.Health
 	router.Use(middleware.Logging())
 	router.Use(middleware.CORS())
 
+	router.GET("/swagger/*any", swaggerHandler())
+
 	router.GET("/api/v1/health", healthHandler.Health)
 
 	api := router.Group("/api/v1")
