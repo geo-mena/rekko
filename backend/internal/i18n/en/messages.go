@@ -19,6 +19,10 @@ const (
 	ReasonActionBy        = "%s by %s"
 	ReasonAnalystsBullish = "%d/%d analysts bullish"
 	ReasonRecentSignals   = "%d analyst signals in the last 7 days"
+	ReasonRealUpside      = "%.1f%% upside from current price ($%.2f → $%.2f target)"
+	ReasonLargeCap        = "Large-cap company ($%.0fB market cap)"
+	ReasonMidCap          = "Mid-cap company ($%.1fB market cap)"
+	ReasonPriceTrendUp    = "Price trending up today (+%.2f%%)"
 
 	DashboardStatsRetrieved = "Dashboard stats retrieved successfully"
 
