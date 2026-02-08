@@ -567,20 +567,45 @@ rekko/
 
 ## Recommendation Algorithm
 
-The recommendation system uses a weighted multi-factor scoring approach to rank stocks. Each stock receives a score from 0-100 based on the following criteria.
+The recommendation engine employs a weighted multi-factor scoring model that combines analyst sentiment with real-time market data. Each ticker receives a composite score on a 0–10 scale, derived from up to eight distinct factors when market data is available, or five analyst-based factors as a fallback.
+
+### Architecture Overview
+
+The system operates in two modes depending on the availability of external market data from **Finnhub**:
+
+- **Enriched mode** — When the Finnhub API key is configured, the engine fetches live quotes and company profiles for every ticker under evaluation. This enables three additional scoring dimensions that ground analyst opinions in actual market conditions.
+- **Fallback mode** — When market data is unavailable — either because the API key is not set or because a specific ticker lacks coverage on Finnhub — the engine relies exclusively on analyst-derived signals, preserving full functionality without external dependencies.
 
 ### Scoring Factors
 
+#### With Market Data — 8 Factors
+
+| Factor | Weight | Source | Description |
+|--------|--------|--------|-------------|
+| **Rating Upgrade** | 15% | Analyst data | Positive transitions in analyst ratings, e.g., Hold to Buy |
+| **Target Price Increase** | 10% | Analyst data | Percentage increase in the analyst's price target |
+| **Action Type** | 15% | Analyst data | Base score derived from the nature of the analyst action |
+| **Consensus** | 20% | Computed | Proportion of brokerages with a bullish stance on the ticker |
+| **Momentum** | 10% | Computed | Time-weighted accumulation of recent analyst signals with exponential decay |
+| **Real Upside** | 15% | Finnhub | Gap between the average analyst target and the current market price |
+| **Market Cap** | 10% | Finnhub | Company size tier — larger capitalizations reflect lower risk and more reliable coverage |
+| **Price Trend** | 5% | Finnhub | Whether today's price movement confirms or contradicts the analyst consensus |
+
+#### Without Market Data — 5 Factors, Fallback
+
 | Factor | Weight | Description |
 |--------|--------|-------------|
-| **Rating Upgrade** | 30% | Positive changes in analyst ratings |
-| **Target Price Increase** | 25% | Percentage increase in price targets |
-| **Action Type** | 25% | Specific analyst actions (upgrade, initiate, etc.) |
-| **Target Price Level** | 20% | Absolute target price as company size indicator |
+| **Rating Upgrade** | 20% | Positive transitions in analyst ratings |
+| **Target Price Increase** | 20% | Percentage increase in analyst price targets |
+| **Action Type** | 20% | Base score from the nature of the analyst action |
+| **Consensus** | 25% | Proportion of bullish brokerages |
+| **Momentum** | 15% | Time-weighted analyst signals |
+
+This dual-weight architecture ensures that tickers with market data benefit from richer context, while those without it are scored fairly under the original model — no ticker is penalized for the absence of external data.
 
 ### Rating Values
 
-The system converts analyst ratings to numerical values for comparison:
+The system converts analyst ratings into a numerical scale from 1 to 5, enabling precise measurement of rating transitions:
 
 | Rating | Value |
 |--------|-------|
@@ -592,7 +617,7 @@ The system converts analyst ratings to numerical values for comparison:
 
 ### Action Scores
 
-Different analyst actions receive different base scores:
+Each analyst action maps to a base score that reflects the strength of the signal:
 
 | Action | Score |
 |--------|-------|
@@ -604,22 +629,47 @@ Different analyst actions receive different base scores:
 | Target Lowered | 30 |
 | Downgraded | 20 |
 
-### Algorithm Details
+### Factor Details
 
-1. **Rating Upgrade Score**: Calculated as the difference between new and old ratings, normalized to 0-100. A jump from Hold (3) to Buy (4) scores higher than Hold to Neutral.
+**Rating Upgrade** — Measures the delta between the previous and current rating on the 1–5 scale, normalized to a 0–100 range. A transition from Hold to Buy yields a higher score than a reiteration at Buy. Tickers that already hold a strong rating — Buy or above — receive a baseline score of 50 even without an upgrade.
 
-2. **Target Price Increase**: The percentage change in target price, capped at 100 points. A 50% increase scores 50 points.
+**Target Price Increase** — Captures the percentage change in the analyst's price target, capped at 100 points. A 50% increase in the target translates directly to a score of 50.
 
-3. **Action Type**: Direct mapping from the action type to a base score, modified by the weight.
+**Action Type** — Assigns the base score from the action table above. This factor rewards decisive bullish actions — upgrades and initiations — over neutral or bearish ones.
 
-4. **Target Price Level**: Higher target prices indicate larger companies:
-   - $500+ = 100 points
-   - $200-499 = 80 points
-   - $100-199 = 60 points
-   - $50-99 = 40 points
-   - Below $50 = 20 points
+**Consensus** — Calculates the percentage of distinct brokerages that have taken a bullish action on the ticker. When fewer than three brokerages cover the stock, the score is discounted proportionally to reflect lower statistical confidence.
 
-The final score is the weighted sum of all factors. Stocks are then ranked by score, with ties broken by the most recent update.
+**Momentum** — Applies an exponential time-decay function over a 30-day window to weight recent analyst signals more heavily than older ones. Bullish actions contribute positively, while bearish actions reduce the accumulated signal at half the rate. A saturation function prevents any single ticker from achieving a disproportionately high momentum score.
+
+**Real Upside** — Computes the actual upside potential by comparing the average analyst target price against the live market price from Finnhub. This is the most impactful enrichment: it transforms abstract analyst targets into a concrete percentage of potential gain. The score normalizes linearly, with 50% or more of upside mapping to the maximum score of 100.
+
+**Market Cap** — Assigns a tier-based score that reflects company size and the reliability of analyst coverage:
+
+| Market Cap | Tier | Score |
+|------------|------|-------|
+| $10B and above | Large-cap | 100 |
+| $2B – $10B | Mid-cap | 75 |
+| $300M – $2B | Small-cap | 50 |
+| Below $300M | Micro-cap | 25 |
+
+**Price Trend** — Evaluates whether the current day's price movement aligns with the prevailing analyst sentiment. When the majority of analysts are bullish and the price is trending upward, the score rises above the neutral baseline of 50. Conversely, a bearish price movement against bullish analyst consensus results in a moderate reduction, signaling a potential divergence worth noting.
+
+### Upside Potential Calculation
+
+The upside potential displayed to the user varies based on data availability:
+
+- **With market data** — Calculated as the gap between the average analyst target and the current Finnhub price: this represents the real upside from the present trading level.
+- **Without market data** — Derived from the maximum percentage change between `targetFrom` and `targetTo` across the ticker's analyst reports.
+
+### Market Data Integration
+
+Real-time market data is sourced from the **Finnhub API**, which provides live quotes and company profiles. The integration is designed with the following considerations:
+
+- **In-memory cache** with a 15-minute TTL per ticker, balancing data freshness against API rate limits.
+- **Parallel fetching** with a concurrency limit of 10 simultaneous requests, ensuring fast batch processing without overwhelming the external service.
+- **Graceful degradation** — if Finnhub returns no data for a specific ticker, or if the API is unreachable, the system falls back to analyst-only scoring for that ticker without affecting others.
+
+The final composite score is the weighted sum of all applicable factors, divided by 10 to produce the 0–10 scale. Recommendations are ranked by descending score.
 
 ---
 
@@ -630,8 +680,9 @@ The final score is the weighted sum of all factors. Stocks are then ranked by sc
 | `DATABASE_URL` | Yes | - | PostgreSQL/CockroachDB connection string |
 | `KARENAI_API_URL` | No | `https://api.karenai.click` | External API base URL |
 | `KARENAI_AUTH_TOKEN` | Yes | - | Bearer token for external API |
+| `FINNHUB_API_KEY` | No | - | Finnhub API key for real-time market data enrichment |
 | `SERVER_PORT` | No | `8080` | Backend server port |
-| `GIN_MODE` | No | `debug` | Gin framework mode (`debug`, `release`) |
+| `GIN_MODE` | No | `debug` | Gin framework mode — `debug` or `release` |
 | `VITE_API_BASE_URL` | No | `http://localhost:8080` | Frontend API URL |
 
 ### Example `.env` file
@@ -643,6 +694,9 @@ DATABASE_URL=postgresql://root@localhost:26257/stockdb?sslmode=disable
 # External API
 KARENAI_API_URL=https://api.karenai.click
 KARENAI_AUTH_TOKEN=your_auth_token_here
+
+# Market Data Enrichment
+FINNHUB_API_KEY=your_finnhub_api_key_here
 
 # Server
 SERVER_PORT=8080

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronRight } from 'lucide-vue-next'
+import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-vue-next'
 
 import { useModal } from '@/composables/use-modal'
 
@@ -12,8 +12,17 @@ const _props = defineProps<Props>()
 
 const { Modal } = useModal()
 
+const md = computed(() => _props.recommendation.marketData)
+
 function formatPrice(value: number): string {
     return value ? `$${value.toFixed(2)}` : '-'
+}
+
+function formatMarketCap(millions: number): string {
+    if (millions >= 1000) {
+        return `$${(millions / 1000).toFixed(1)}B`
+    }
+    return `$${millions.toFixed(0)}M`
 }
 </script>
 
@@ -26,8 +35,53 @@ function formatPrice(value: number): string {
             </component>
             <component :is="Modal.Description">
                 Score: {{ recommendation.score }}/10
+                <span v-if="md?.industry" class="ml-2 text-xs text-muted-foreground">
+                    &middot; {{ md.industry }}
+                </span>
             </component>
         </component>
+
+        <div v-if="!md" class="flex items-center gap-2 rounded-lg border border-dashed p-3 mt-3 text-sm text-muted-foreground">
+            <span>Market data not available for this ticker. Score is based on analyst data only.</span>
+        </div>
+        <div v-if="md" class="flex items-center gap-4 rounded-lg border bg-muted/30 p-3 mt-3">
+            <div class="flex-1">
+                <p class="text-xs text-muted-foreground">
+                    Current Price
+                </p>
+                <p class="text-lg font-semibold">
+                    {{ formatPrice(md.currentPrice) }}
+                </p>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs text-muted-foreground">
+                    Day Change
+                </p>
+                <div
+                    class="flex items-center gap-1"
+                    :class="md.dayChangePercent >= 0 ? 'text-emerald-600' : 'text-red-600'"
+                >
+                    <component :is="md.dayChangePercent >= 0 ? TrendingUp : TrendingDown" class="size-4" />
+                    <span class="font-medium">{{ md.dayChangePercent >= 0 ? '+' : '' }}{{ md.dayChangePercent.toFixed(2) }}%</span>
+                </div>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs text-muted-foreground">
+                    Day Range
+                </p>
+                <p class="text-sm font-medium">
+                    {{ formatPrice(md.dayLow) }} – {{ formatPrice(md.dayHigh) }}
+                </p>
+            </div>
+            <div v-if="md.marketCap > 0" class="flex-1">
+                <p class="text-xs text-muted-foreground">
+                    Market Cap
+                </p>
+                <p class="text-sm font-medium">
+                    {{ formatMarketCap(md.marketCap) }}
+                </p>
+            </div>
+        </div>
 
         <div class="grid grid-cols-2 gap-4 py-4">
             <div class="space-y-1">
@@ -43,6 +97,7 @@ function formatPrice(value: number): string {
                     }"
                 >
                     {{ recommendation.upsidePotential > 0 ? '+' : '' }}{{ recommendation.upsidePotential.toFixed(1) }}%
+                    <span class="text-xs text-muted-foreground ml-1">{{ md ? '(vs market price)' : '(vs analyst target change)' }}</span>
                 </p>
             </div>
 
@@ -79,6 +134,15 @@ function formatPrice(value: number): string {
                 </p>
                 <p class="text-sm font-medium">
                     {{ recommendation.analystCount }} covering
+                </p>
+            </div>
+
+            <div v-if="md" class="space-y-1">
+                <p class="text-sm text-muted-foreground">
+                    Prev. Close
+                </p>
+                <p class="text-sm font-medium">
+                    {{ formatPrice(md.previousClose) }}
                 </p>
             </div>
         </div>

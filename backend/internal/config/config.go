@@ -8,6 +8,7 @@ type Config struct {
 	DatabaseURL     string
 	KarenaiAPIURL   string
 	KarenaiAPIToken string
+	FinnhubAPIKey   string
 	ServerPort      string
 	MigrationsPath  string
 }
@@ -17,6 +18,7 @@ func Load() *Config {
 		DatabaseURL:     getEnv("DATABASE_URL", "postgresql://root@localhost:26257/stockdb?sslmode=disable"),
 		KarenaiAPIURL:   getEnv("KARENAI_API_URL", "https://api.karenai.click"),
 		KarenaiAPIToken: getEnv("KARENAI_AUTH_TOKEN", ""),
+		FinnhubAPIKey:   getEnv("FINNHUB_API_KEY", ""),
 		ServerPort:      getEnv("SERVER_PORT", "8080"),
 		MigrationsPath:  getEnv("MIGRATIONS_PATH", "./migrations"),
 	}

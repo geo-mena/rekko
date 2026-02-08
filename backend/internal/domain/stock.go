@@ -39,12 +39,24 @@ func NewStockFilter() StockFilter {
 	}
 }
 
+type MarketData struct {
+	CurrentPrice  float64 `json:"currentPrice"`
+	DayChange     float64 `json:"dayChange"`
+	DayChangePct  float64 `json:"dayChangePercent"`
+	DayHigh       float64 `json:"dayHigh"`
+	DayLow        float64 `json:"dayLow"`
+	PreviousClose float64 `json:"previousClose"`
+	MarketCap     float64 `json:"marketCap"`
+	Industry      string  `json:"industry"`
+}
+
 type StockRecommendation struct {
-	Stock           Stock    `json:"stock"`
-	Score           float64  `json:"score"`
-	Reasons         []string `json:"reasons"`
-	UpsidePotential float64  `json:"upsidePotential"`
-	AnalystCount    int      `json:"analystCount"`
+	Stock           Stock       `json:"stock"`
+	Score           float64     `json:"score"`
+	Reasons         []string    `json:"reasons"`
+	UpsidePotential float64     `json:"upsidePotential"`
+	AnalystCount    int         `json:"analystCount"`
+	MarketData      *MarketData `json:"marketData,omitempty"`
 }
 
 type PaginatedStocks struct {

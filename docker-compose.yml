@@ -29,6 +29,7 @@ services:
       - DATABASE_URL=postgresql://root@cockroachdb:26257/stockdb?sslmode=disable
       - KARENAI_API_URL=https://api.karenai.click
       - KARENAI_AUTH_TOKEN=${KARENAI_AUTH_TOKEN}
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY}
       - SERVER_PORT=8080
       - GIN_MODE=release
     depends_on:

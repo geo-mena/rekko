@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 
-import { ArrowDown, ArrowUp, Minus, Star, Users } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, DollarSign, Minus, Star, TrendingDown, TrendingUp, Users } from 'lucide-vue-next'
 import { h } from 'vue'
 
 import DataTableColumnHeader from '@/components/data-table/column-header.vue'
@@ -65,6 +65,31 @@ export const columns: ColumnDef<StockRecommendation>[] = [
             })
         },
         enableSorting: true,
+    },
+    {
+        id: 'currentPrice',
+        header: ({ column }) => h(DataTableColumnHeader<StockRecommendation>, { column, title: 'Price' }),
+        cell: ({ row }) => {
+            const md = row.original.marketData
+            if (!md)
+                return h('span', { class: 'text-sm text-muted-foreground italic', title: 'Market data unavailable for this ticker' }, 'not available')
+
+            const trendIcon = md.dayChangePercent >= 0 ? TrendingUp : TrendingDown
+            const colorClass = md.dayChangePercent >= 0 ? 'text-emerald-600' : 'text-red-600'
+            const changeFormatted = `${md.dayChangePercent >= 0 ? '+' : ''}${md.dayChangePercent.toFixed(2)}%`
+
+            return h('div', { class: 'flex flex-col gap-0.5' }, [
+                h('div', { class: 'flex items-center gap-1' }, [
+                    h(DollarSign, { class: 'size-3.5 text-muted-foreground' }),
+                    h('span', { class: 'font-medium' }, md.currentPrice.toFixed(2)),
+                ]),
+                h('div', { class: `flex items-center gap-1 text-xs ${colorClass}` }, [
+                    h(trendIcon, { class: 'size-3' }),
+                    h('span', changeFormatted),
+                ]),
+            ])
+        },
+        enableSorting: false,
     },
     {
         accessorKey: 'upsidePotential',

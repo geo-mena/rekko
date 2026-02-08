@@ -29,7 +29,7 @@ func newTestApp() *testApp {
 	mockRepo := &repository.MockStockRepository{}
 
 	stockUsecase := usecase.NewStockUsecase(mockRepo, nil)
-	recommendationUsecase := usecase.NewRecommendationUsecase(mockRepo)
+	recommendationUsecase := usecase.NewRecommendationUsecase(mockRepo, nil)
 	dashboardUsecase := usecase.NewDashboardUsecase(mockRepo)
 
 	stockHandler := handler.NewStockHandler(stockUsecase, recommendationUsecase)
