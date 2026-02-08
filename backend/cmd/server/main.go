@@ -1,14 +1,10 @@
 package main
 
 import (
-	"log"
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/geomena/stock-recommendation-system/backend/internal/config"
 	httpDelivery "github.com/geomena/stock-recommendation-system/backend/internal/delivery/http"
 	"github.com/geomena/stock-recommendation-system/backend/internal/delivery/http/handler"
+	"github.com/geomena/stock-recommendation-system/backend/internal/external/finnhub"
 	"github.com/geomena/stock-recommendation-system/backend/internal/external/karenai"
 	"github.com/geomena/stock-recommendation-system/backend/internal/repository/cockroachdb"
 	"github.com/geomena/stock-recommendation-system/backend/internal/usecase"
@@ -26,22 +22,19 @@ import (
 func main() {
 	cfg := config.Load()
 
-	db, err := cockroachdb.NewDB(cfg.DatabaseURL)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
+	db := initDatabase(cfg.DatabaseURL, cfg.MigrationsPath)
 	defer db.Close()
-
-	if err := db.RunMigrations(cfg.MigrationsPath); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
-	log.Println("Database migrations completed")
 
 	stockRepo := cockroachdb.NewStockRepository(db)
 	karenaiClient := karenai.NewClient(cfg.KarenaiAPIURL, cfg.KarenaiAPIToken)
 
+	var finnhubClient *finnhub.Client
+	if cfg.FinnhubAPIKey != "" {
+		finnhubClient = finnhub.NewClient(cfg.FinnhubAPIKey)
+	}
+
 	stockUsecase := usecase.NewStockUsecase(stockRepo, karenaiClient)
-	recommendationUsecase := usecase.NewRecommendationUsecase(stockRepo)
+	recommendationUsecase := usecase.NewRecommendationUsecase(stockRepo, finnhubClient)
 	dashboardUsecase := usecase.NewDashboardUsecase(stockRepo)
 
 	stockHandler := handler.NewStockHandler(stockUsecase, recommendationUsecase)
@@ -50,16 +43,6 @@ func main() {
 
 	router := httpDelivery.NewRouter(stockHandler, healthHandler, dashboardHandler)
 
-	go func() {
-		log.Printf("Server starting on port %s", cfg.ServerPort)
-		if err := router.Run(":" + cfg.ServerPort); err != nil {
-			log.Fatalf("Failed to start server: %v", err)
-		}
-	}()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-
-	log.Println("Shutting down server...")
+	startServer(router, cfg.ServerPort)
+	waitForShutdown()
 }
