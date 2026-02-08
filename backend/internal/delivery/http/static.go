@@ -15,20 +15,17 @@ func registerStaticRoutes(router *gin.Engine, staticDir string) {
 	router.NoRoute(func(c *gin.Context) {
 		path := c.Request.URL.Path
 
-		// Skip API and Swagger routes
 		if strings.HasPrefix(path, "/api/") || strings.HasPrefix(path, "/swagger/") {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return
 		}
 
-		// Try to serve the static file
 		filePath := filepath.Join(staticDir, path)
 		if _, err := os.Stat(filePath); err == nil {
 			fs.ServeHTTP(c.Writer, c.Request)
 			return
 		}
 
-		// SPA fallback: serve index.html
 		c.File(filepath.Join(staticDir, "index.html"))
 	})
 }
