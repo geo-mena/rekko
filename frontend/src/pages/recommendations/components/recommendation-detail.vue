@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next'
+import { ChevronRight } from 'lucide-vue-next'
 
 import { useModal } from '@/composables/use-modal'
 
@@ -94,16 +94,10 @@ function formatPrice(value: number): string {
                     :key="index"
                     class="flex items-start gap-2 text-sm text-muted-foreground"
                 >
-                    <Check class="size-4 mt-0.5 shrink-0 text-emerald-600" />
+                    <ChevronRight class="size-4 mt-0.5 shrink-0 text-emerald-600" />
                     <span>{{ reason }}</span>
                 </li>
             </ul>
         </div>
-
-        <component :is="Modal.Footer">
-            <UiButton variant="outline" @click="emit('close')">
-                Close
-            </UiButton>
-        </component>
     </div>
 </template>
