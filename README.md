@@ -24,6 +24,7 @@ Stock recommendation engine powered by analyst ratings and price targets.
   - [Backend Setup](#backend-setup)
   - [Frontend Setup](#frontend-setup)
   - [Database Only](#database-only)
+- [Deploy to Railway](#deploy-to-railway)
 - [API Documentation](#api-documentation)
 - [API Endpoints](#api-endpoints)
   - [Health Check](#health-check)
@@ -246,6 +247,87 @@ docker-compose up -d cockroachdb
 Access the database:
 - **SQL CLI**: `docker exec -it rekko-cockroachdb cockroach sql --insecure`
 - **Admin UI**: http://localhost:8081
+
+## Deploy to Railway
+
+The project includes a unified Dockerfile at the repository root that produces a single container image with both the Go backend and the Vue frontend. This image is designed for platforms such as Railway, where each service runs in its own isolated container with a managed database alongside it.
+
+### Architecture
+
+The unified image compiles the Vue application into static files and embeds them into the Go binary's runtime. The backend serves the API on `/api/v1/*`, the Swagger documentation on `/swagger/*`, and all remaining routes fall through to the Vue single-page application. There is no need for Nginx, no cross-origin configuration between services, and no coordination of multiple containers — a single process handles everything.
+
+```
+Browser → https://your-app.up.railway.app
+         │
+         ├── /api/v1/*  → Go API handlers
+         ├── /swagger/* → Swagger UI
+         └── /*         → Vue SPA — static files and client-side routing
+```
+
+### Step-by-step
+
+#### 1. Create the project
+
+Sign in to [Railway](https://railway.app) and create a new project. Connect your GitHub repository when prompted.
+
+#### 2. Add PostgreSQL
+
+Click **"+ New"** → **"Database"** → **"PostgreSQL"**. Railway provisions the instance and generates the connection string automatically.
+
+#### 3. Add the application service
+
+Click **"+ New"** → **"GitHub Repo"** and select the Rekko repository. Configure the service under **Settings**:
+
+| Setting | Value |
+|---------|-------|
+| Builder | Dockerfile |
+| Dockerfile Path | `./Dockerfile` |
+| Healthcheck Path | `/api/v1/health` |
+
+#### 4. Configure environment variables
+
+Navigate to the service's **Variables** tab and add the following entries:
+
+| Variable | Value | Description |
+|----------|-------|-------------|
+| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` | Railway resolves this reference to the PostgreSQL connection string |
+| `DB_DRIVER` | `postgres` | Switches the migration driver from CockroachDB to PostgreSQL |
+| `KARENAI_AUTH_TOKEN` | Your token | Bearer token for the KarenAI external API |
+| `FINNHUB_API_KEY` | Your key | Finnhub API key for real-time market data — optional |
+
+The remaining variables — `PORT`, `STATIC_DIR`, `MIGRATIONS_PATH`, and `GIN_MODE` — are preconfigured in the Dockerfile and do not require manual overrides.
+
+#### 5. Generate a public domain
+
+Go to **Settings** → **Networking** → **"Generate Domain"**. Railway assigns a URL in the form `https://<project>.up.railway.app`.
+
+#### 6. Populate the database
+
+After the first successful deploy, the database will be empty. Trigger an initial data sync:
+
+```bash
+curl -X POST https://<your-domain>.up.railway.app/api/v1/sync
+```
+
+### How deployments work
+
+Railway monitors the configured branch — `main` by default — and triggers an automatic rebuild on every push. The platform builds the Docker image, runs the healthcheck against `/api/v1/health`, and routes traffic to the new container only after it responds successfully. The previous container remains active during this transition, ensuring zero-downtime deployments.
+
+### Unified image details
+
+The root `Dockerfile` executes a three-stage build:
+
+| Stage | Base Image | Output |
+|-------|------------|--------|
+| **Frontend build** | `node:20-alpine` | Compiled Vue assets in `/app/dist` |
+| **Backend build** | `golang:1.24-alpine` | Statically linked Go binary with Swagger docs |
+| **Runtime** | `alpine:latest` | Final image — approximately 83 MB — containing the binary, migrations, and static files |
+
+The `STATIC_DIR` environment variable tells the Go server where to find the frontend assets. When this variable is empty — as it is by default in local development — the server operates in API-only mode and does not serve static files.
+
+### Compatibility note
+
+All changes introduced for Railway are fully backward-compatible with the existing Docker Compose workflow. The `DB_DRIVER` variable defaults to `cockroachdb`, the `STATIC_DIR` defaults to an empty string, and the `SERVER_PORT` variable takes precedence over the Railway-injected `PORT`. Running `docker-compose up` locally continues to work without modifications.
 
 ## API Documentation
 
@@ -682,15 +764,17 @@ The final composite score is the weighted sum of all applicable factors, divided
 | `KARENAI_API_URL` | No | `https://api.karenai.click` | External API base URL |
 | `KARENAI_AUTH_TOKEN` | Yes | - | Bearer token for external API |
 | `FINNHUB_API_KEY` | No | - | Finnhub API key for real-time market data enrichment |
-| `SERVER_PORT` | No | `8080` | Backend server port |
+| `SERVER_PORT` | No | `8080` | Backend server port — falls back to `PORT` if not set, for Railway compatibility |
 | `GIN_MODE` | No | `debug` | Gin framework mode — `debug` or `release` |
 | `MIGRATIONS_PATH` | No | `./migrations` | Path to the SQL migration files directory |
+| `DB_DRIVER` | No | `cockroachdb` | Database migration driver — `cockroachdb` for local, `postgres` for Railway |
+| `STATIC_DIR` | No | - | Path to the frontend static files directory — when set, the backend serves the Vue SPA |
 
 ### Frontend
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `VITE_SERVER_API_URL` | Yes | - | Base URL for the backend API, e.g. `http://localhost:3000` |
+| `VITE_SERVER_API_URL` | No | `""` | Base URL for the backend API — leave empty when the frontend is served from the same origin as the backend |
 | `VITE_SERVER_API_PREFIX` | Yes | - | API path prefix appended to the base URL, e.g. `/api` |
 | `VITE_SERVER_API_TIMEOUT` | No | `5000` | HTTP request timeout in milliseconds |
 
