@@ -13,7 +13,7 @@ Stock recommendation engine powered by analyst ratings and price targets.
 
 </div>
 
-## Table of Contents
+## 📑 Table of Contents
 
 - [Project Overview](#project-overview)
 - [Tech Stack](#tech-stack)
@@ -40,7 +40,7 @@ Stock recommendation engine powered by analyst ratings and price targets.
 - [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
 
-## Project Overview
+## 🔍 Project Overview
 
 Rekko aggregates analyst recommendations from external sources and applies a weighted scoring algorithm to identify the most promising investment opportunities. The system provides:
 
@@ -49,7 +49,7 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 - A responsive web interface for browsing, searching, and filtering stock recommendations
 - RESTful API for programmatic access to stock data and recommendations
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -61,7 +61,7 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 | **Build Tools** | Docker, Docker Compose |
 | **Package Manager** | pnpm (frontend) |
 
-## Features
+## ✨ Features
 
 - **Data Synchronization**: Fetch and store stock data from external APIs with pagination support
 - **Search & Filter**: Search stocks by ticker, company name, or analyst action
@@ -77,7 +77,7 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 - **Responsive UI**: Mobile-friendly interface built with Tailwind CSS and shadcn-vue, featuring dark/light theme support and a collapsible sidebar navigation
 - **Interactive API Documentation**: Auto-generated Swagger UI for exploring and testing all endpoints directly from the browser
 
-## Prerequisites
+## 📦 Prerequisites
 
 ### For Docker Deployment (Recommended)
 - Docker 20.10+
@@ -89,7 +89,7 @@ Rekko aggregates analyst recommendations from external sources and applies a wei
 - pnpm 8+ (`npm install -g pnpm`)
 - CockroachDB (can run via Docker)
 
-## Quick Start (Docker)
+## 🚀 Quick Start (Docker)
 
 The fastest way to get the application running is with Docker Compose.
 
@@ -176,7 +176,7 @@ To also remove the database volume:
 docker-compose down -v
 ```
 
-## Local Development
+## 💻 Local Development
 
 ### Backend Setup
 
@@ -247,7 +247,7 @@ Access the database:
 - **SQL CLI**: `docker exec -it rekko-cockroachdb cockroach sql --insecure`
 - **Admin UI**: http://localhost:8081
 
-## API Documentation
+## 📖 API Documentation
 
 The backend ships with auto-generated **Swagger/OpenAPI** documentation, built using [swag](https://github.com/swaggo/swag) annotations embedded in every handler. The Swagger specification is regenerated at build time via `swag init` during the Docker build, ensuring that the documentation always reflects the current state of the codebase.
 
@@ -267,7 +267,7 @@ go install github.com/swaggo/swag/cmd/swag@v1.16.6
 swag init -g cmd/server/main.go -o docs --parseInternal
 ```
 
-## API Endpoints
+## 🔌 API Endpoints
 
 Base URL: `http://localhost:8080/api/v1`
 
@@ -566,7 +566,7 @@ Response:
 3. Upserts records into the database (updates existing, inserts new)
 4. Returns the count of processed records
 
-## Recommendation Algorithm
+## 🧠 Recommendation Algorithm
 
 The recommendation engine employs a weighted multi-factor scoring model that combines analyst sentiment with real-time market data. Each ticker receives a composite score on a 0–10 scale, derived from up to eight distinct factors when market data is available, or five analyst-based factors as a fallback.
 
@@ -672,7 +672,7 @@ Real-time market data is sourced from the **Finnhub API**, which provides live q
 
 The final composite score is the weighted sum of all applicable factors, divided by 10 to produce the 0–10 scale. Recommendations are ranked by descending score.
 
-## Environment Variables
+## ⚙️ Environment Variables
 
 ### Backend
 
@@ -720,7 +720,7 @@ VITE_SERVER_API_PREFIX=/api
 VITE_SERVER_API_TIMEOUT=5000
 ```
 
-## Testing
+## 🧪 Testing
 
 ### Backend Testing
 
@@ -776,7 +776,7 @@ curl http://localhost:8080/api/v1/recommendations/top
 curl http://localhost:8080/api/v1/dashboard/stats
 ```
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### Common Issues
 
@@ -884,6 +884,6 @@ If you encounter issues not covered here:
 3. Ensure all prerequisites are installed with the correct versions
 4. Try rebuilding containers: `docker-compose build --no-cache`
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
