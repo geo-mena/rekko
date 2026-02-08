@@ -9,7 +9,6 @@ interface Props {
     recommendation: StockRecommendation
 }
 const _props = defineProps<Props>()
-const emit = defineEmits<{ close: [] }>()
 
 const { Modal } = useModal()
 
