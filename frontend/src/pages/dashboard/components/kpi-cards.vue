@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BarChart3, Building2, Star, TrendingUp } from 'lucide-vue-next'
+import { Award, ChartNoAxesCombined, Landmark, LayoutGrid } from 'lucide-vue-next'
 
 import type { StockRecommendation } from '@/pages/recommendations/data/schema'
 
@@ -22,12 +22,14 @@ const avgUpside = computed(() => {
 
 <template>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <UiCard>
+        <UiCard style="background: linear-gradient(135deg, oklch(0.6 0.15 250 / 0.03) 0%, transparent 50%)">
             <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
                 <UiCardTitle class="text-sm font-medium">
                     Total Stocks
                 </UiCardTitle>
-                <BarChart3 class="size-4 text-muted-foreground" />
+                <div class="flex items-center justify-center size-9 rounded-lg bg-blue-500/10">
+                    <LayoutGrid class="size-5" style="color: oklch(0.6 0.15 250)" />
+                </div>
             </UiCardHeader>
             <UiCardContent>
                 <div class="text-2xl font-bold">
@@ -40,12 +42,14 @@ const avgUpside = computed(() => {
             </UiCardContent>
         </UiCard>
 
-        <UiCard>
+        <UiCard style="background: linear-gradient(135deg, oklch(0.75 0.15 85 / 0.03) 0%, transparent 50%)">
             <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
                 <UiCardTitle class="text-sm font-medium">
                     Top Pick
                 </UiCardTitle>
-                <Star class="size-4 text-muted-foreground" />
+                <div class="flex items-center justify-center size-9 rounded-lg bg-amber-500/10">
+                    <Award class="size-5" style="color: oklch(0.75 0.15 85)" />
+                </div>
             </UiCardHeader>
             <UiCardContent>
                 <div class="text-2xl font-bold">
@@ -61,12 +65,14 @@ const avgUpside = computed(() => {
             </UiCardContent>
         </UiCard>
 
-        <UiCard>
+        <UiCard style="background: linear-gradient(135deg, oklch(0.696 0.17 162.48 / 0.03) 0%, transparent 50%)">
             <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
                 <UiCardTitle class="text-sm font-medium">
                     Avg Upside
                 </UiCardTitle>
-                <TrendingUp class="size-4 text-muted-foreground" />
+                <div class="flex items-center justify-center size-9 rounded-lg" style="background: oklch(0.696 0.17 162.48 / 0.1)">
+                    <ChartNoAxesCombined class="size-5" style="color: oklch(0.696 0.17 162.48)" />
+                </div>
             </UiCardHeader>
             <UiCardContent>
                 <div class="text-2xl font-bold">
@@ -79,12 +85,14 @@ const avgUpside = computed(() => {
             </UiCardContent>
         </UiCard>
 
-        <UiCard>
+        <UiCard style="background: linear-gradient(135deg, oklch(0.6 0.2 290 / 0.03) 0%, transparent 50%)">
             <UiCardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
                 <UiCardTitle class="text-sm font-medium">
                     Brokerages
                 </UiCardTitle>
-                <Building2 class="size-4 text-muted-foreground" />
+                <div class="flex items-center justify-center size-9 rounded-lg bg-violet-500/10">
+                    <Landmark class="size-5" style="color: oklch(0.6 0.2 290)" />
+                </div>
             </UiCardHeader>
             <UiCardContent>
                 <div class="text-2xl font-bold">

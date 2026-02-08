@@ -4,8 +4,9 @@ import type { RecommendationFilter } from '@/services/api/recommendations.api'
 import { useGetDashboardStatsQuery } from '@/services/api/dashboard.api'
 import { useGetRecommendationsQuery, useGetTopRecommendationQuery } from '@/services/api/recommendations.api'
 
+import ActionDistributionChart from './action-distribution-chart.vue'
 import KpiCards from './kpi-cards.vue'
-import TopRecommendations from './top-recommendations.vue'
+import TopPicksChart from './top-picks-chart.vue'
 
 const { data: stats, isLoading: statsLoading } = useGetDashboardStatsQuery()
 const { data: topPick, isLoading: topPickLoading } = useGetTopRecommendationQuery()
@@ -23,9 +24,15 @@ const { data: recommendations, isLoading: recsLoading } = useGetRecommendationsQ
             :loading="statsLoading || topPickLoading || recsLoading"
         />
 
-        <TopRecommendations
-            :recommendations="recommendations ?? []"
-            :loading="recsLoading"
-        />
+        <div class="grid gap-4 md:grid-cols-2">
+            <ActionDistributionChart
+                :data="stats?.actionDistribution ?? []"
+                :loading="statsLoading"
+            />
+            <TopPicksChart
+                :data="recommendations ?? []"
+                :loading="recsLoading"
+            />
+        </div>
     </div>
 </template>
