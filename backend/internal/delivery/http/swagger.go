@@ -2,6 +2,7 @@ package http
 
 import (
 	"io/fs"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,8 @@ func swaggerHandler() gin.HandlerFunc {
 		case "/", "":
 			f, err := swaggerFiles.FS.(fs.ReadFileFS).ReadFile("index.html")
 			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
+				log.Printf("swagger error: %v", err)
+			c.String(http.StatusInternalServerError, "internal error")
 				return
 			}
 			c.Header("Content-Type", "text/html; charset=utf-8")
@@ -27,7 +29,8 @@ func swaggerHandler() gin.HandlerFunc {
 		case "/doc.json":
 			doc, err := swag.ReadDoc()
 			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
+				log.Printf("swagger error: %v", err)
+			c.String(http.StatusInternalServerError, "internal error")
 				return
 			}
 			c.Header("Content-Type", "application/json")

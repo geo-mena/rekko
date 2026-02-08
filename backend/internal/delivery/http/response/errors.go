@@ -1,6 +1,11 @@
 package response
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+
+	"github.com/geomena/stock-recommendation-system/backend/internal/i18n/en"
+)
 
 func Error(w http.ResponseWriter, statusCode int, message string) {
 	write(w, statusCode, Response{
@@ -50,6 +55,7 @@ func Conflict(w http.ResponseWriter, message string) {
 	Error(w, http.StatusConflict, message)
 }
 
-func InternalServerError(w http.ResponseWriter, message string) {
-	Error(w, http.StatusInternalServerError, message)
+func InternalServerError(w http.ResponseWriter, err error) {
+	log.Printf("internal error: %v", err)
+	Error(w, http.StatusInternalServerError, en.InternalError)
 }

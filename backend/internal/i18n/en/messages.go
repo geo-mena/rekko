@@ -23,4 +23,6 @@ const (
 	DashboardStatsRetrieved = "Dashboard stats retrieved successfully"
 
 	ServiceRunning = "Service is running"
+
+	InternalError = "an unexpected error occurred"
 )

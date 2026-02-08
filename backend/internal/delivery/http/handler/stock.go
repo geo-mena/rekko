@@ -58,7 +58,7 @@ func (h *StockHandler) ListStocks(c *gin.Context) {
 
 	result, err := h.stockUsecase.ListStocks(c.Request.Context(), filter)
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (h *StockHandler) GetStock(c *gin.Context) {
 			response.NotFound(c.Writer, en.StockNotFound)
 			return
 		}
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 
@@ -122,7 +122,7 @@ func (h *StockHandler) GetByTicker(c *gin.Context) {
 
 	stocks, err := h.stockUsecase.GetStocksByTicker(c.Request.Context(), ticker)
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 
@@ -141,7 +141,7 @@ func (h *StockHandler) GetByTicker(c *gin.Context) {
 func (h *StockHandler) GetActions(c *gin.Context) {
 	actions, err := h.stockUsecase.GetDistinctActions(c.Request.Context())
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 
@@ -160,7 +160,7 @@ func (h *StockHandler) GetActions(c *gin.Context) {
 func (h *StockHandler) SyncStocks(c *gin.Context) {
 	count, err := h.stockUsecase.SyncFromExternalAPI(c.Request.Context())
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 
@@ -188,7 +188,7 @@ func (h *StockHandler) GetRecommendations(c *gin.Context) {
 
 	recommendations, err := h.recommendationUsecase.GetTopRecommendations(c.Request.Context(), limit, search)
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 
@@ -208,7 +208,7 @@ func (h *StockHandler) GetRecommendations(c *gin.Context) {
 func (h *StockHandler) GetTopRecommendation(c *gin.Context) {
 	recommendation, err := h.recommendationUsecase.GetBestStock(c.Request.Context())
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 

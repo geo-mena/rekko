@@ -29,7 +29,7 @@ func NewDashboardHandler(du *usecase.DashboardUsecase) *DashboardHandler {
 func (h *DashboardHandler) GetStats(c *gin.Context) {
 	stats, err := h.dashboardUsecase.GetDashboardStats(c.Request.Context())
 	if err != nil {
-		response.InternalServerError(c.Writer, err.Error())
+		response.InternalServerError(c.Writer, err)
 		return
 	}
 	response.Success(c.Writer, http.StatusOK, en.DashboardStatsRetrieved, stats)
