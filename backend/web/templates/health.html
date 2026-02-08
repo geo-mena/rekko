@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekko API - Health Status</title>
+    <style>
+        :root {
+            --color-ring: hsl(340, 100%, 90%);
+            --color-primary-foreground: hsl(240, 40%, 4%);
+            --color-popover: hsl(240, 20%, 5%);
+            --color-popover-foreground: hsl(250, 20%, 90%);
+            --color-primary: hsl(340, 100%, 90%);
+            --color-border: hsl(220, 15%, 15%);
+            --color-background: hsl(220, 15%, 6%);
+            --color-foreground: hsl(220, 15%, 87%);
+            --color-muted: hsl(220, 20%, 15%);
+            --color-muted-foreground: hsl(220, 15%, 60%);
+            --color-accent: hsl(250, 20%, 15%);
+            --color-secondary: hsl(240, 20%, 15%);
+            --color-card-foreground: hsl(240, 15%, 87%);
+            --color-card: hsl(240, 20%, 5%);
+            --color-secondary-foreground: hsl(250, 20%, 90%);
+            --color-accent-foreground: hsl(340, 5%, 90%);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--color-background);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        .subtitle {
+            color: var(--color-muted-foreground);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .pulse {
+            width: 16px;
+            height: 16px;
+            background: hsl(142, 76%, 55%);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px hsla(142, 76%, 55%, 0.5);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        .status-text {
+            color: hsl(142, 76%, 55%);
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .info-grid {
+            display: grid;
+            gap: 16px;
+            margin-top: 32px;
+        }
+        .info-card {
+            background: var(--color-muted);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+        }
+        .info-label {
+            color: var(--color-muted-foreground);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .info-value {
+            color: var(--color-foreground);
+            font-size: 15px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .version-badge {
+            display: inline-block;
+            background: var(--color-accent);
+            color: var(--color-primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 24px;
+            border: 1px solid var(--color-border);
+        }
+        .footer {
+            margin-top: 40px;
+            color: var(--color-muted-foreground);
+            font-size: 13px;
+        }
+        .footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Rekko</div>
+        <div class="subtitle">Stock Recommendation API</div>
+
+        <div class="status-indicator">
+            <div class="pulse"></div>
+            <span class="status-text">Operational</span>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">Service Status</div>
+                <div class="info-value">{{.Message}}</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Timestamp (UTC)</div>
+                <div class="info-value">{{.Timestamp}}</div>
+            </div>
+        </div>
+
+        <span class="version-badge">API v1</span>
+
+        <div class="footer">
+            <a href="/swagger/index.html">View API Documentation</a>
+        </div>
+    </div>
+</body>
+</html>

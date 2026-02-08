@@ -13,3 +13,9 @@ func write(w http.ResponseWriter, statusCode int, resp Response) {
 		http.Error(w, `{"status":false,"message":"error encoding response"}`, http.StatusInternalServerError)
 	}
 }
+
+func WriteHTML(w http.ResponseWriter, statusCode int, html string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(statusCode)
+	w.Write([]byte(html))
+}
